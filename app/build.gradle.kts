@@ -61,12 +61,5 @@ dependencies {
 //    implementation(libs.viewmodel)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.barcode.scanning)
-    implementation("com.google.android.gms:play-services-code-scanner:16.1.0")
-
-
-//    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
-//
-//
-//    coreLibraryDesugaring ("com.android.tools:desugar_jdk_libs:1.1.5")
-//    implementation( "androidx.multidex:multidex:2.0.1")
+    implementation(libs.play.services.code.scanner)
 }

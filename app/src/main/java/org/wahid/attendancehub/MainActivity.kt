@@ -169,6 +169,12 @@ class MainActivity : ComponentActivity() {
     private fun startQrScan(context: Context){
 
         val scanner = GmsBarcodeScanning.getClient(context).startScan()
+        scanner.addOnSuccessListener { barcode ->
+            val rawValue = barcode.rawValue
+            Log.d("MainActivity", "Scanned QR Code: $rawValue")
+        }.addOnFailureListener { e ->
+            Log.e("MainActivity", "Error scanning QR Code", e)
+        }
 
     }
 
