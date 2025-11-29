@@ -20,7 +20,7 @@ import androidx.core.app.ActivityCompat
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
-import com.google.zxing.integration.android.IntentIntegrator
+import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
 import org.wahid.attendancehub.ui.MainViewModel
 import org.wahid.attendancehub.ui.theme.AttendanceHubTheme
 
@@ -166,18 +166,9 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun startQrScan(){
+    private fun startQrScan(context: Context){
 
-        val options = BarcodeScannerOptions.Builder()
-            .setBarcodeFormats(
-                Barcode.FORMAT_QR_CODE,
-                Barcode.FORMAT_AZTEC,
-            )
-
-
-            .build()
-
-
+        val scanner = GmsBarcodeScanning.getClient(context).startScan()
 
     }
 
