@@ -8,6 +8,9 @@
 
     <uses-permission  android:minSdkVersion="33" android:name="android.permission.NEARBY_WIFI_DEVICES"/>
 
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-feature android:name="android.hardware.camera" />
+
 
 
     <application
