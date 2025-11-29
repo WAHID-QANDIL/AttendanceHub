@@ -17,10 +17,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.app.ActivityCompat
-import com.google.mlkit.vision.barcode.BarcodeScannerOptions
-import com.google.mlkit.vision.barcode.BarcodeScanning
-import com.google.mlkit.vision.barcode.common.Barcode
-import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
+import org.wahid.attendancehub.ui.ActionType
 import org.wahid.attendancehub.ui.MainViewModel
 import org.wahid.attendancehub.ui.theme.AttendanceHubTheme
 
@@ -109,11 +106,10 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        startQrScan(this)
         val multiplePermissionsLauncher =
             registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissionsMap: Map<String, Boolean> ->
                 permissionsMap.forEach { (permission, isGranted) ->
-                    viewModel.onPermissionResult(permission = permission, isGranted = isGranted)
+                    viewModel.onAction(actionType = ActionType.RequestPermission(permission = permission))
                 }
 
                 val hasLocation = ActivityCompat.checkSelfPermission(
@@ -131,7 +127,7 @@ class MainActivity : ComponentActivity() {
                 if (hasLocation && hasNearbyWifi) {
                     startLocalHotspot(Looper.getMainLooper())
                 } else {
-                    viewModel.openAppSettings(activity = findActivity()!!)
+                    viewModel.onAction(actionType = ActionType.OpenAppSettings( activity = findActivity()!!))
                     Log.e(TAG, "Required permissions are not granted after request.")
                 }
             }
@@ -153,7 +149,7 @@ class MainActivity : ComponentActivity() {
         } else {
             permissionsToRequest.forEach { permission ->
                 if (ActivityCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
-                    viewModel.onPermissionResult(permission, false)
+                    viewModel.onAction(actionType = ActionType.RequestPermission(permission = permission))
                 }
             }
             multiplePermissionsLauncher.launch(permissionsToRequest.toTypedArray())
@@ -165,28 +161,4 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
-    private fun startQrScan(context: Context){
-
-        val scanner = GmsBarcodeScanning.getClient(context).startScan()
-        scanner.addOnSuccessListener { barcode ->
-            val rawValue = barcode.rawValue
-            Log.d("MainActivity", "Scanned QR Code: $rawValue")
-        }.addOnFailureListener { e ->
-            Log.e("MainActivity", "Error scanning QR Code", e)
-        }
-
-    }
-
-
-
-//    private fun startQrScan(activity: Activity) {
-//        val integrator = IntentIntegrator(activity)
-//        integrator.setPrompt("Scan teacher QR")
-//        integrator.setBeepEnabled(true)
-//        integrator.setCameraId(0)
-//        integrator.setBarcodeImageEnabled(true)
-//        integrator.setOrientationLocked(false)
-//        integrator.initiateScan()
-//    }
 }
