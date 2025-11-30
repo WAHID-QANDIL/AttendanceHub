@@ -46,13 +46,14 @@ android {
 
     flavorDimensions += "user_type"
     productFlavors {
+        create("teacher") {
+            isDefault = true
+            dimension = "user_type"
+            applicationId = "com.attendancehub.teacher"
+        }
         create("student") {
             dimension = "user_type"
             applicationId = "com.attendancehub.student"
-        }
-        create("teacher") {
-            dimension = "user_type"
-            applicationId = "com.attendancehub.teacher"
         }
 
     }
