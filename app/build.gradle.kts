@@ -10,6 +10,9 @@ android {
         version = release(36)
     }
 
+
+    compileSdk = 36
+
     defaultConfig {
         applicationId = "org.wahid.attendancehub"
         minSdk = 28
@@ -39,6 +42,19 @@ android {
     }
     buildFeatures {
         compose = true
+    }
+
+    flavorDimensions += "user_type"
+    productFlavors {
+        create("student") {
+            dimension = "user_type"
+            applicationId = "com.attendancehub.student"
+        }
+        create("teacher") {
+            dimension = "user_type"
+            applicationId = "com.attendancehub.teacher"
+        }
+
     }
 }
 
