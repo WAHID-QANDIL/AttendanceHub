@@ -830,6 +830,7 @@ Contributions are welcome! Please follow these guidelines:
 ## 📄 License
 
 *MIT LICENCE*
+![LICENCE.mf](LICENCE.md)
 
 ---
 
