@@ -8,6 +8,12 @@
 
 Teachers create a WiFi hotspot from their device, and students connect to it. The teacher's device acts as a local server, automatically logging student attendance when they connect. The system uses QR codes for easy connection and provides real-time attendance tracking.
 
+<img width="860" height="920" alt="Screenshot 2025-12-01 040320" src="https://github.com/user-attachments/assets/c35565f1-68a3-41ac-ac77-91a97fa2db86" />
+<img width="843" height="915" alt="Screenshot 2025-12-01 040341" src="https://github.com/user-attachments/assets/24f55cef-a8e3-46eb-9846-ed082b73c3ba" />
+<img width="870" height="931" alt="Screenshot 2025-12-01 040402" src="https://github.com/user-attachments/assets/9606eba5-06c5-41a9-98f2-a047f24d5cbb" />
+<img width="834" height="918" alt="Screenshot 2025-12-01 040423" src="https://github.com/user-attachments/assets/41057eaf-70c5-43e4-9c34-44fadda8279b" />
+<img width="862" height="923" alt="Screenshot 2025-12-01 040303" src="https://github.com/user-attachments/assets/9306c705-2e07-48f1-bc24-e2b1b5e99c42" />
+
 ---
 
 ## 📱 App Variants
