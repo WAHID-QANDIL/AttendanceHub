@@ -3,6 +3,7 @@
 <div align="center">
 
 **Modern Android Application for Classroom Attendance Management**
+![AttendanceHub.png](AttendanceHub.png)
 
 [![Platform](https://img.shields.io/badge/Platform-Android-green.svg)](https://www.android.com/)
 [![Language](https://img.shields.io/badge/Language-Kotlin-blue.svg)](https://kotlinlang.org/)
