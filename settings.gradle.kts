@@ -21,3 +21,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "Attendance Hub"
 include(":app")
+include(":core")
+include(":student")
+
+

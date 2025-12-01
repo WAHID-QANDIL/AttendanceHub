@@ -14,7 +14,7 @@ class MainViewModel: androidx.lifecycle.ViewModel() {
 
 
 
-    fun dismissDialog() {
+    private fun dismissDialog() {
         visiblePermissionDialogQueue.removeAt(visiblePermissionDialogQueue.lastIndex)
     }
 
