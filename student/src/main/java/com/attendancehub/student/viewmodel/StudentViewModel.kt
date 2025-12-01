@@ -37,6 +37,10 @@ sealed class StudentUiState {
 }
 
 class StudentViewModel(application: Application) : AndroidViewModel(application) {
+    companion object {
+        private const val MANUAL_CONNECTION_EXPIRY_MS = 2 * 60 * 60 * 1000L // 2 hours
+    }
+
     private val TAG = "StudentViewModel"
     private val hotspotManager = StudentHotspotManager(application)
     private val attendanceClient = AttendanceClient()
@@ -273,7 +277,7 @@ class StudentViewModel(application: Application) : AndroidViewModel(application)
                 port = 8080,
                 sessionId = java.util.UUID.randomUUID().toString(),
                 token = null,
-                expiryTimestamp = System.currentTimeMillis() + (2 * 60 * 60 * 1000)
+                expiryTimestamp = System.currentTimeMillis() + MANUAL_CONNECTION_EXPIRY_MS
             )
 
             // Connect using manual data
