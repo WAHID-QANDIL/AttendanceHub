@@ -5,13 +5,6 @@ plugins {
     kotlin("plugin.serialization") version "2.0.21"
 }
 
-tasks.register("printConfigs"){
-    doLast {
-        println("--- configurations for project ':app' ---")
-        configurations.forEach { println(it.name) }
-        println("--- end ---")
-    }
-}
 
 android {
     namespace = "org.wahid.attendancehub"
