@@ -830,7 +830,8 @@ Contributions are welcome! Please follow these guidelines:
 ## 📄 License
 
 *MIT LICENCE*
-[LICENCE](LICENCE)
+[[LICENCE]([https://github.com/WAHID-QANDIL](https://github.com/WAHID-QANDIL/AttendanceHub/blob/master/LICENSE))]
+
 
 ---
 
