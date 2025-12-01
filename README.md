@@ -829,15 +829,15 @@ Contributions are welcome! Please follow these guidelines:
 
 ## 📄 License
 
-*License information to be added*
+*MIT LICENCE*
 
 ---
 
 ## 📞 Contact & Support
 
 - **Developer**: WAHID-QANDIL
-- **GitHub**: [Repository Link]
-- **Email**: [Contact Email]
+- **GitHub**: [[Repository Link](https://github.com/WAHID-QANDIL)]
+- **Email**: [wahidqandill@gmail.com]
 
 ---
 
