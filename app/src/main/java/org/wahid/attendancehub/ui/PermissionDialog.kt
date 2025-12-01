@@ -10,16 +10,20 @@ fun PermissionDialog(
     permission: String,
     isPermissionDeclined: Boolean,
     onDismissRequest: () -> Unit,
-    onConfirmRequest:@Composable () -> Unit,
-    onGoToAppSettingsClick:() -> Unit,
+    onConfirmRequest: () -> Unit,
+    onGoToAppSettingsClick: () -> Unit,
 
     ) {
 
     androidx.compose.material3.AlertDialog(
         onDismissRequest = onDismissRequest,
-        confirmButton = onConfirmRequest,
+        confirmButton = {
+            androidx.compose.material3.TextButton(onClick = onConfirmRequest) {
+                Text(if (isPermissionDeclined) "Request again" else "Request")
+            }
+        },
         title = { Text("Request permission") },
-        text = {Text("You have to grant the $permission permission, to continue using the app")},
+        text = { Text("You have to grant the ${permission.substringAfterLast('.')} permission to continue using the app") },
         modifier = modifier,
         dismissButton = {
             androidx.compose.material3.TextButton(onClick = onGoToAppSettingsClick) {
