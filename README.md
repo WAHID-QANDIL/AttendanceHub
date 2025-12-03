@@ -829,15 +829,17 @@ Contributions are welcome! Please follow these guidelines:
 
 ## 📄 License
 
-*License information to be added*
+*MIT LICENCE*
+[[LICENCE](https://github.com/WAHID-QANDIL/AttendanceHub/blob/master/LICENSE)]
+
 
 ---
 
 ## 📞 Contact & Support
 
 - **Developer**: WAHID-QANDIL
-- **GitHub**: [Repository Link]
-- **Email**: [Contact Email]
+- **GitHub**: [[Repository Link](https://github.com/WAHID-QANDIL)]
+- **Email**: [wahidqandill@gmail.com]
 
 ---
 
