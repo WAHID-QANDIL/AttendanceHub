@@ -2,6 +2,8 @@ package com.attendancehub.student.viewmodel
 
 import android.app.Application
 import android.content.Context
+import android.net.wifi.WifiManager
+import android.text.format.Formatter
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -51,7 +53,7 @@ class StudentViewModel(application: Application) : AndroidViewModel(application)
 
     private val TAG = "StudentViewModel"
     private val hotspotManager = StudentHotspotManager(application)
-    private val attendanceClient = AttendanceClient()
+    private val attendanceClient = AttendanceClient(context = application)
     private val wifiScanner = com.attendancehub.net.WiFiScanner(application)
     private val prefs = application.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
@@ -373,5 +375,20 @@ class StudentViewModel(application: Application) : AndroidViewModel(application)
     private fun getCurrentTime(): String {
         val formatter = java.text.SimpleDateFormat("h:mm:ss a", java.util.Locale.getDefault())
         return formatter.format(java.util.Date())
+    }
+    private fun resolveServerIp(context: Context): String {
+        val wifiManager =
+            context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        val dhcpInfo = wifiManager.dhcpInfo
+
+        val gatewayInt = dhcpInfo.gateway
+        if (gatewayInt == 0) {
+            // This usually means "not connected to Wi-Fi / hotspot"
+            throw IllegalStateException("Gateway IP is 0. Are you connected to the teacher hotspot?")
+        }
+
+        val gatewayIp = Formatter.formatIpAddress(gatewayInt)
+        Log.d(TAG, "Resolved teacher gateway IP: $gatewayIp")
+        return gatewayIp
     }
 }
