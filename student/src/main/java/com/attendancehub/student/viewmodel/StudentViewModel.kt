@@ -1,10 +1,12 @@
 package com.attendancehub.student.viewmodel
 
 import android.app.Application
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.attendancehub.api.AttendanceClient
+import com.attendancehub.models.ServerResponse
 import com.attendancehub.models.StudentAttendance
 import com.attendancehub.net.StudentHotspotManager
 import com.attendancehub.student.ui.screens.ConnectionStep
@@ -21,6 +23,7 @@ import java.util.UUID
 
 sealed class StudentUiState {
     object Idle : StudentUiState()
+    object StudentInfo : StudentUiState()
     object QRScanning : StudentUiState()
     object ManualEntry : StudentUiState()
     data class Scanning(val networks: List<WifiNetwork>) : StudentUiState()
@@ -39,12 +42,18 @@ sealed class StudentUiState {
 class StudentViewModel(application: Application) : AndroidViewModel(application) {
     companion object {
         private const val MANUAL_CONNECTION_EXPIRY_MS = 2 * 60 * 60 * 1000L // 2 hours
+        private const val PREFS_NAME = "student_prefs"
+        private const val KEY_FIRST_NAME = "first_name"
+        private const val KEY_LAST_NAME = "last_name"
+        private const val KEY_STUDENT_ID = "student_id"
+        private const val KEY_DEVICE_ID = "device_id"
     }
 
     private val TAG = "StudentViewModel"
     private val hotspotManager = StudentHotspotManager(application)
     private val attendanceClient = AttendanceClient()
     private val wifiScanner = com.attendancehub.net.WiFiScanner(application)
+    private val prefs = application.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
     private val _uiState = MutableStateFlow<StudentUiState>(StudentUiState.Idle)
     val uiState: StateFlow<StudentUiState> = _uiState.asStateFlow()
@@ -52,7 +61,47 @@ class StudentViewModel(application: Application) : AndroidViewModel(application)
     private val _availableNetworks = MutableStateFlow<List<WifiNetwork>>(emptyList())
     val availableNetworks: StateFlow<List<WifiNetwork>> = _availableNetworks.asStateFlow()
 
+    // Student info state
+    private val _firstName = MutableStateFlow(prefs.getString(KEY_FIRST_NAME, "") ?: "")
+    val firstName: StateFlow<String> = _firstName.asStateFlow()
+
+    private val _lastName = MutableStateFlow(prefs.getString(KEY_LAST_NAME, "") ?: "")
+    val lastName: StateFlow<String> = _lastName.asStateFlow()
+
+    private val _studentId = MutableStateFlow(prefs.getString(KEY_STUDENT_ID, "") ?: "")
+    val studentId: StateFlow<String> = _studentId.asStateFlow()
+
     private var connectionStartTime: Long = 0
+
+    init {
+        // Check if student info is saved
+        if (!hasStudentInfo()) {
+            _uiState.value = StudentUiState.StudentInfo
+        }
+    }
+
+    private fun hasStudentInfo(): Boolean {
+        return _firstName.value.isNotBlank() &&
+               _lastName.value.isNotBlank() &&
+               _studentId.value.isNotBlank()
+    }
+
+    fun saveStudentInfo(firstName: String, lastName: String, studentId: String) {
+        _firstName.value = firstName
+        _lastName.value = lastName
+        _studentId.value = studentId
+
+        prefs.edit().apply {
+            putString(KEY_FIRST_NAME, firstName)
+            putString(KEY_LAST_NAME, lastName)
+            putString(KEY_STUDENT_ID, studentId)
+            apply()
+        }
+
+        Log.d(TAG, "Student info saved: $firstName $lastName ($studentId)")
+        // Navigate to network scan after saving
+        scanNetworks()
+    }
 
     fun scanNetworks() {
         viewModelScope.launch {
@@ -128,32 +177,52 @@ class StudentViewModel(application: Application) : AndroidViewModel(application)
 
                 Log.d(TAG, "Successfully connected to WiFi")
 
-                // Step 3: Registering attendance
-                delay(1000)
+                // Step 3: Wait for network to be fully ready
+                // The network binding may succeed but routes may not be established yet
+                delay(3000) // Increased from 1000ms to 3000ms
+
                 _uiState.value = StudentUiState.Connecting(
                     network.ssid,
                     ConnectionStep.REGISTERING
                 )
 
-                // Send attendance data
+                // Get student full name
+                val fullName = "${_firstName.value} ${_lastName.value}".trim()
+
+                // Send attendance data with real student info
                 val studentData = StudentAttendance(
-                    studentId = "12345", // TODO: Get from user profile
-                    name = "John Doe", // TODO: Get from user profile
-                    timestamp = java.time.Instant.now().toString(),
+                    studentId = _studentId.value,
+                    name = fullName,
+                    timestamp = System.currentTimeMillis().toString(),
                     deviceId = getDeviceId(),
                     sessionId = qrData?.sessionId ?: UUID.randomUUID().toString(),
                     token = qrData?.token
                 )
 
+                Log.d(TAG, "Submitting attendance for: $fullName (${_studentId.value})")
+
                 val serverIp = qrData?.serverIp ?: "192.168.49.1"
                 val port = qrData?.port ?: 8080
 
                 Log.d(TAG, "Sending attendance to $serverIp:$port")
-                val sendResult = attendanceClient.sendAttendance(serverIp, port, studentData)
 
-                if (sendResult.isFailure) {
+                // Retry logic for attendance submission
+                var sendResult: Result<ServerResponse>? = null
+                var attempts = 0
+                val maxAttempts = 3
+
+                while (attempts < maxAttempts && (sendResult == null || sendResult.isFailure)) {
+                    if (attempts > 0) {
+                        Log.d(TAG, "Retry attempt $attempts of $maxAttempts")
+                        delay(2000) // Wait 2 seconds between retries
+                    }
+                    attempts++
+                    sendResult = attendanceClient.sendAttendance(serverIp, port, studentData)
+                }
+
+                if (sendResult?.isFailure == true) {
                     val errorMsg = sendResult.exceptionOrNull()?.message ?: "Failed to mark attendance"
-                    Log.e(TAG, "Attendance submission failed: $errorMsg")
+                    Log.e(TAG, "Attendance submission failed after $attempts attempts: $errorMsg")
                     _uiState.value = StudentUiState.Error(
                         "Connected but failed to mark attendance: $errorMsg"
                     )
@@ -286,8 +355,12 @@ class StudentViewModel(application: Application) : AndroidViewModel(application)
     }
 
     private fun getDeviceId(): String {
-        // TODO: Store in SharedPreferences
-        return UUID.randomUUID().toString()
+        var deviceId = prefs.getString(KEY_DEVICE_ID, null)
+        if (deviceId == null) {
+            deviceId = UUID.randomUUID().toString()
+            prefs.edit().putString(KEY_DEVICE_ID, deviceId).apply()
+        }
+        return deviceId
     }
 
     private fun getDuration(): String {

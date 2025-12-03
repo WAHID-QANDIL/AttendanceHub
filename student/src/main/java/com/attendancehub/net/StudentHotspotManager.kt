@@ -73,12 +73,17 @@ class StudentHotspotManager(private val ctx: Context) : HotspotManager {
                 override fun onAvailable(network: Network) {
                     Log.d(TAG, "Network available: $network")
 
+                    // Log network capabilities
+                    val caps = cm.getNetworkCapabilities(network)
+                    Log.d(TAG, "Network capabilities: $caps")
+
                     // CRITICAL: Bind process to this network
                     // This ensures all HTTP/socket calls use the hotspot network
                     val bound = cm.bindProcessToNetwork(network)
                     if (bound) {
                         boundNetwork = network
                         Log.d(TAG, "Process bound to network successfully")
+                        Log.d(TAG, "Bound network: ${cm.getBoundNetworkForProcess()}")
                         deferred.complete(Result.success(Unit))
                     } else {
                         Log.e(TAG, "Failed to bind process to network")

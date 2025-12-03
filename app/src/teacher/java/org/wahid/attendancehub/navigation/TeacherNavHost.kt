@@ -73,15 +73,14 @@ fun TeacherNavHost(
 
         // Hotspot Active Screen
         composable(TeacherScreen.HotspotActive.route) {
-            // Re-collect state here to ensure screen updates when state changes
             val currentUiState by viewModel.uiState.collectAsState()
-            val state = currentUiState as? TeacherUiState.HotspotActive
+            val connectedStudents by viewModel.connectedStudents.collectAsState()
 
-            state?.let {
+            (currentUiState as? TeacherUiState.HotspotActive)?.let {
                 // Log when connected students list changes
-                LaunchedEffect(it.connectedStudents.size) {
-                    Log.d("TeacherNavHost", "HotspotActiveScreen - Connected students count: ${it.connectedStudents.size}")
-                    it.connectedStudents.forEachIndexed { index, student ->
+                LaunchedEffect(connectedStudents.size) {
+                    Log.d("TeacherNavHost", "HotspotActiveScreen - Connected students count: ${connectedStudents.size}")
+                    connectedStudents.forEachIndexed { index, student ->
                         Log.d("TeacherNavHost", "  Student $index: ${student.name}")
                     }
                 }
@@ -90,10 +89,9 @@ fun TeacherNavHost(
                     ssid = it.ssid,
                     password = it.password,
                     qrBitmap = it.qrBitmap,
-                    connectedStudents = it.connectedStudents,
+                    connectedStudents = connectedStudents,
                     onEndSession = {
                         viewModel.stopHotspot()
-                        // Navigation handled by state observer above
                     },
                     onDownloadList = {
                         viewModel.downloadStudentList()
@@ -103,4 +101,3 @@ fun TeacherNavHost(
         }
     }
 }
-

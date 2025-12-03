@@ -21,6 +21,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.attendancehub.student.ui.screens.AttendanceSuccessScreen
 import com.attendancehub.student.ui.screens.ConnectingScreen
+import com.attendancehub.student.ui.screens.ConnectionStep
 import com.attendancehub.student.ui.screens.ManualEntryDialog
 import com.attendancehub.student.ui.screens.PermissionsScreen
 import com.attendancehub.student.ui.screens.QRScannerScreen
@@ -36,10 +37,20 @@ fun StudentNavHost(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val availableNetworks by viewModel.availableNetworks.collectAsState()
+    val firstName by viewModel.firstName.collectAsState()
+    val lastName by viewModel.lastName.collectAsState()
+    val studentId by viewModel.studentId.collectAsState()
 
     // Navigate based on UI state
     LaunchedEffect(uiState) {
         when (val state = uiState) {
+            is StudentUiState.StudentInfo -> {
+                if (navController.currentDestination?.route != StudentScreen.StudentInfo.route) {
+                    navController.navigate(StudentScreen.StudentInfo.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+            }
             is StudentUiState.QRScanning -> {
                 if (navController.currentDestination?.route != StudentScreen.QRScanner.route) {
                     navController.navigate(StudentScreen.QRScanner.route)
@@ -80,6 +91,18 @@ fun StudentNavHost(
         navController = navController,
         startDestination = if (hasPermissions) StudentScreen.NetworkScan.route else StudentScreen.Permissions.route
     ) {
+        // Student Info Screen
+        composable(StudentScreen.StudentInfo.route) {
+            com.attendancehub.student.ui.screens.StudentInfoScreen(
+                onInfoSaved = { first, last, id ->
+                    viewModel.saveStudentInfo(first, last, id)
+                },
+                existingFirstName = firstName,
+                existingLastName = lastName,
+                existingStudentId = studentId
+            )
+        }
+
         // Permissions Screen
         composable(StudentScreen.Permissions.route) {
             PermissionsScreen(
@@ -168,7 +191,7 @@ fun StudentNavHost(
 
             ConnectingScreen(
                 networkName = networkName,
-                currentStep = state?.currentStep ?: com.attendancehub.student.ui.screens.ConnectionStep.NETWORK_FOUND
+                currentStep = state?.currentStep ?: ConnectionStep.NETWORK_FOUND
             )
         }
 

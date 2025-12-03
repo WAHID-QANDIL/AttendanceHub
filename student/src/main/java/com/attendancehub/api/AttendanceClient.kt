@@ -109,6 +109,10 @@ class AttendanceClient {
 
         } catch (e: Exception) {
             Log.e(TAG, "Failed to send attendance", e)
+            Log.e(TAG, "Exception type: ${e.javaClass.simpleName}")
+            Log.e(TAG, "Exception message: ${e.message}")
+            Log.e(TAG, "Server IP: $serverIp, Port: $port")
+            e.printStackTrace()
             Result.failure(e)
         } finally {
             connection?.disconnect()

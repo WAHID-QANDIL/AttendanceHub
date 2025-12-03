@@ -65,6 +65,7 @@ class WiFiScanner(private val context: Context) {
                             val isTeacherNetwork = result.SSID.contains("DIRECT", ignoreCase = true) ||
                                                   result.SSID.contains("Teacher", ignoreCase = true) ||
                                                   result.SSID.contains("Class", ignoreCase = true) ||
+                                                  result.SSID.contains("AndroidShare", ignoreCase = true) ||
                                                   result.SSID.contains("Attendance", ignoreCase = true)
 
                             WifiNetwork(
@@ -95,6 +96,7 @@ class WiFiScanner(private val context: Context) {
         }
 
         // Start scan
+        if(!isWifiEnabled()){enableWifi()}
         val scanStarted = wifiManager.startScan()
         if (!scanStarted) {
             Log.e(TAG, "Failed to start WiFi scan")
@@ -113,6 +115,7 @@ class WiFiScanner(private val context: Context) {
             try {
                 context.unregisterReceiver(receiver)
             } catch (e: IllegalArgumentException) {
+                Log.d(TAG, "Receiver not registered")
                 // Receiver not registered
             }
         }
