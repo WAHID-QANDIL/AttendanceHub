@@ -55,6 +55,7 @@ class AttendanceServer(private val port: Int = 8080) {
                 while (isActive) {
                     try {
                         val client = serverSocket?.accept()
+                        Log.d(TAG, "Client is null: ${client == null}")
                         if (client != null) {
                             Log.d(TAG, "Client connected from ${client.inetAddress.hostAddress}")
                             handleClient(client)
@@ -66,6 +67,7 @@ class AttendanceServer(private val port: Int = 8080) {
                             Log.e(TAG, "Error accepting client", e)
                         }
                     }
+                Log.d(TAG, "Server accept loop is still active")
                 }
                 Log.d(TAG, "Server accept loop ended")
             }
@@ -113,16 +115,21 @@ class AttendanceServer(private val port: Int = 8080) {
                 // Handle routes
                 when {
                     method == "POST" && path == "/join" -> {
+
+
                         // Read body
                         val body = CharArray(contentLength)
                         reader.read(body, 0, contentLength)
                         val bodyString = String(body)
 
+                        Log.d(TAG, "POST: method $body")
                         handleJoinRequest(bodyString, writer)
                     }
+
                     method == "GET" && path == "/status" -> {
                         handleStatusRequest(writer)
                     }
+
                     else -> {
                         sendResponse(writer, 404, "Not Found", """{"error":"Endpoint not found"}""")
                     }
@@ -131,6 +138,13 @@ class AttendanceServer(private val port: Int = 8080) {
                 client.close()
             } catch (e: Exception) {
                 Log.e(TAG, "Error handling client", e)
+            } finally {
+                try {
+                    client.close()
+                    Log.d(TAG, "client socket closed")
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error closing client socket", e)
+                }
             }
         }
     }
@@ -142,7 +156,10 @@ class AttendanceServer(private val port: Int = 8080) {
             Log.d(TAG, "Body content: $body")
 
             val studentAttendance = json.decodeFromString<StudentAttendance>(body)
-            Log.d(TAG, "✅ Parsed student: ${studentAttendance.name} (ID: ${studentAttendance.studentId})")
+            Log.d(
+                TAG,
+                "Parsed student: ${studentAttendance.name} (ID: ${studentAttendance.studentId})"
+            )
             Log.d(TAG, "Device ID: ${studentAttendance.deviceId}")
             Log.d(TAG, "Timestamp: ${studentAttendance.timestamp}")
 
@@ -150,35 +167,56 @@ class AttendanceServer(private val port: Int = 8080) {
             Log.d(TAG, "Current students count: ${_connectedStudents.value.size}")
             val isDuplicate = _connectedStudents.value.any {
                 it.deviceId == studentAttendance.deviceId ||
-                it.studentId == studentAttendance.studentId
+                        it.studentId == studentAttendance.studentId
             }
 
             if (isDuplicate) {
-                Log.w(TAG, "❌ Duplicate submission from ${studentAttendance.name}")
-                sendResponse(writer, 409, "Conflict", """{"status":"error","message":"Already registered"}""")
+                Log.w(TAG, "Duplicate submission from ${studentAttendance.name}")
+                sendResponse(
+                    writer,
+                    409,
+                    "Conflict",
+                    """{"status":"error","message":"Already registered"}"""
+                )
             } else {
                 // Add to list
                 val oldSize = _connectedStudents.value.size
-                _connectedStudents.value = _connectedStudents.value + studentAttendance
+                _connectedStudents.value += studentAttendance
                 val newSize = _connectedStudents.value.size
 
                 Log.d(TAG, "✅ Student added successfully!")
                 Log.d(TAG, "Students count: $oldSize → $newSize")
                 Log.d(TAG, "StateFlow emitted: ${_connectedStudents.value.size} students")
 
-                sendResponse(writer, 200, "OK", """{"status":"success","message":"Attendance recorded"}""")
+                // Log all current students
+                _connectedStudents.value.forEachIndexed { index, student ->
+                    Log.d(TAG, "  [$index] ${student.name} - ${student.studentId}")
+                }
+
+                sendResponse(
+                    writer,
+                    200,
+                    "OK",
+                    """{"status":"success","message":"Attendance recorded"}"""
+                )
             }
         } catch (e: Exception) {
-            Log.e(TAG, "❌ Error processing attendance", e)
+            Log.e(TAG, "Error processing attendance", e)
             Log.e(TAG, "Error type: ${e.javaClass.simpleName}")
             Log.e(TAG, "Error message: ${e.message}")
             e.printStackTrace()
-            sendResponse(writer, 500, "Internal Server Error", """{"status":"error","message":"${e.message}"}""")
+            sendResponse(
+                writer,
+                500,
+                "Internal Server Error",
+                """{"status":"error","message":"${e.message}"}"""
+            )
         }
     }
 
     private fun handleStatusRequest(writer: PrintWriter) {
-        val response = """{"status":"ok","connectedStudents":${_connectedStudents.value.size},"timestamp":${System.currentTimeMillis()}}"""
+        val response =
+            """{"status":"ok","connectedStudents":${_connectedStudents.value.size},"timestamp":${System.currentTimeMillis()}}"""
         sendResponse(writer, 200, "OK", response)
     }
 
