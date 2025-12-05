@@ -1,10 +1,13 @@
 package org.wahid.attendancehub.navigation
 
+import android.app.Dialog
+import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -13,6 +16,7 @@ import androidx.navigation.compose.rememberNavController
 import org.wahid.attendancehub.ui.screens.HotspotActiveScreen
 import org.wahid.attendancehub.ui.screens.PermissionsScreen
 import org.wahid.attendancehub.ui.screens.TeacherHomeScreen
+import org.wahid.attendancehub.ui.utils.openAppSettings
 import org.wahid.attendancehub.ui.viewmodel.TeacherUiState
 import org.wahid.attendancehub.ui.viewmodel.TeacherViewModel
 
@@ -20,7 +24,8 @@ import org.wahid.attendancehub.ui.viewmodel.TeacherViewModel
 fun TeacherNavHost(
     navController: NavHostController = rememberNavController(),
     viewModel: TeacherViewModel = viewModel(),
-    hasPermissions: Boolean = false
+    hasPermissions: Boolean = false,
+    showAppSettingDialog: ()-> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -55,7 +60,8 @@ fun TeacherNavHost(
                     navController.navigate(TeacherScreen.Home.route) {
                         popUpTo(TeacherScreen.Permissions.route) { inclusive = true }
                     }
-                }
+                },
+                showAppSettingDialog = showAppSettingDialog
             )
         }
 
