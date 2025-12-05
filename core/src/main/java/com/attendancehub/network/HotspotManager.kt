@@ -1,4 +1,4 @@
-package com.attendancehub.net
+package com.attendancehub.network
 
 interface HotspotManager {
     suspend fun start(): Result<HotspotInfo>

@@ -13,9 +13,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.attendancehub.student.R
 
 data class WifiNetwork(
     val ssid: String,
@@ -51,13 +53,13 @@ fun StudentNetworkScanScreen(
                         .padding(24.dp)
                 ) {
                     Text(
-                        text = "Attendance Check-In",
+                        text = stringResource(R.string.attendance_check_in),
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
                     )
                     Text(
-                        text = "Connect to your teacher's network",
+                        text = stringResource(R.string.connect_teacher_network_prompt),
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color.White.copy(alpha = 0.9f)
                     )
@@ -89,7 +91,7 @@ fun StudentNetworkScanScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "Available Networks",
+                                text = stringResource(R.string.available_networks),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.SemiBold
                             )
@@ -97,7 +99,7 @@ fun StudentNetworkScanScreen(
                             IconButton(onClick = onRefresh) {
                                 Icon(
                                     imageVector = Icons.Default.Refresh,
-                                    contentDescription = "Refresh",
+                                    contentDescription = stringResource(R.string.refresh),
                                     tint = MaterialTheme.colorScheme.primary
                                 )
                             }
@@ -155,14 +157,14 @@ fun StudentNetworkScanScreen(
                         Spacer(modifier = Modifier.width(12.dp))
                         Column {
                             Text(
-                                text = "Looking for your class?",
+                                text = stringResource(R.string.looking_for_class),
                                 style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.SemiBold,
                                 color = Color(0xFFF57F17)
                             )
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
-                                text = "Make sure your teacher has enabled their hotspot. Then tap the refresh button to scan for networks.",
+                                text = stringResource(R.string.looking_for_class_description),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = Color(0xFF827717)
                             )
@@ -191,7 +193,7 @@ fun StudentNetworkScanScreen(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Scan QR Code",
+                        text = stringResource(R.string.scan_qr_code),
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -217,7 +219,7 @@ fun StudentNetworkScanScreen(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Enter Network Manually",
+                        text = stringResource(R.string.enter_network_manually),
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -291,7 +293,7 @@ fun TeacherNetworkItem(
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
-                                text = "Strong signal",
+                                text = stringResource(R.string.strong_signal),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -320,7 +322,7 @@ fun TeacherNetworkItem(
                 )
             ) {
                 Text(
-                    text = "Connect to Class",
+                    text = stringResource(R.string.connect_to_class),
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -355,13 +357,13 @@ fun TeacherNetworkItem(
             )
             Column {
                 Text(
-                    text = "Teacher network found!",
+                    text = stringResource(R.string.teacher_network_found),
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.SemiBold,
                     color = Color(0xFF2E7D32)
                 )
                 Text(
-                    text = "Connect to mark your attendance for today's class.",
+                    text = stringResource(R.string.teacher_network_found_desc),
                     style = MaterialTheme.typography.bodySmall,
                     color = Color(0xFF388E3C)
                 )
@@ -402,7 +404,7 @@ fun NetworkListItem(
                     fontWeight = FontWeight.Medium
                 )
                 Text(
-                    text = if (network.isSecured) "Secured" else "Open",
+                    text = if (network.isSecured) stringResource(R.string.secured_network) else stringResource(R.string.open_network),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -417,7 +419,7 @@ fun NetworkListItem(
                 1 -> Icons.Default.NetworkWifi1Bar
                 else -> Icons.Default.NetworkWifi
             },
-            contentDescription = "Signal strength",
+            contentDescription = stringResource(R.string.signal_strength),
             tint = MaterialTheme.colorScheme.primary
         )
     }

@@ -1,8 +1,9 @@
 package com.attendancehub.models
 
+import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.Serializable
 
-/**
+@InternalSerializationApi /**
  * Data encoded in QR code displayed by teacher
  * Students scan this to get connection parameters
  */
@@ -17,7 +18,7 @@ data class QRData(
     val expiryTimestamp: Long? = null    // Optional session expiry (Unix timestamp)
 )
 
-/**
+@InternalSerializationApi /**
  * Student attendance data sent to teacher server
  */
 @Serializable
@@ -30,7 +31,7 @@ data class StudentAttendance(
     val token: String? = null            // Authentication token (if required)
 )
 
-/**
+@InternalSerializationApi /**
  * Server response after processing attendance
  */
 @Serializable
@@ -41,7 +42,7 @@ data class ServerResponse(
     val attendanceId: String? = null     // Unique ID assigned by server (for tracking)
 )
 
-/**
+@InternalSerializationApi /**
  * Real-time attendance update (for WebSocket/SSE streaming)
  */
 @Serializable
@@ -52,7 +53,7 @@ data class AttendanceUpdate(
     val totalCount: Int? = null
 )
 
-/**
+@InternalSerializationApi /**
  * Session info for teacher dashboard
  */
 @Serializable
