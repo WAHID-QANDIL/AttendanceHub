@@ -1,4 +1,4 @@
-package org.wahid.attendancehub
+package com.attendancehub
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -11,8 +11,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import com.attendancehub.student.navigation.StudentNavHost
+import com.attendancehub.student.ui.theme.AttendanceHubTheme
 import com.attendancehub.student.viewmodel.StudentViewModel
-import org.wahid.attendancehub.ui.theme.AttendanceHubTheme
 
 class StudentMainActivity : ComponentActivity() {
     private val viewModel by viewModels<StudentViewModel>()
@@ -67,4 +67,3 @@ class StudentMainActivity : ComponentActivity() {
         }
     }
 }
-

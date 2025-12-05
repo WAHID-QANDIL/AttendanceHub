@@ -12,14 +12,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.attendancehub.student.R
 
 @Composable
 fun ManualEntryDialog(
@@ -33,6 +34,9 @@ fun ManualEntryDialog(
     var passwordError by remember { mutableStateOf<String?>(null) }
 
     val focusManager = LocalFocusManager.current
+    val errorSsidRequired = stringResource(R.string.error_ssid_required)
+    val errorPasswordRequired = stringResource(R.string.error_password_required)
+
 
     Dialog(onDismissRequest = onDismiss) {
         Card(
@@ -57,14 +61,14 @@ fun ManualEntryDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Manual Connection",
+                        text = stringResource(R.string.manual_connection_title),
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold
                     )
                     IconButton(onClick = onDismiss) {
                         Icon(
                             imageVector = Icons.Default.Close,
-                            contentDescription = "Close"
+                            contentDescription = stringResource(R.string.close_button_desc)
                         )
                     }
                 }
@@ -72,7 +76,7 @@ fun ManualEntryDialog(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Enter the WiFi network details provided by your teacher",
+                    text = stringResource(R.string.manual_connection_subtitle),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -86,8 +90,8 @@ fun ManualEntryDialog(
                         ssid = it
                         ssidError = null
                     },
-                    label = { Text("Network Name (SSID)") },
-                    placeholder = { Text("e.g., DIRECT-xy-Android_1234") },
+                    label = { Text(stringResource(R.string.ssid_label)) },
+                    placeholder = { Text(stringResource(R.string.ssid_placeholder)) },
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Wifi,
@@ -117,8 +121,8 @@ fun ManualEntryDialog(
                         password = it
                         passwordError = null
                     },
-                    label = { Text("Password") },
-                    placeholder = { Text("Enter WiFi password") },
+                    label = { Text(stringResource(R.string.password_label)) },
+                    placeholder = { Text(stringResource(R.string.password_placeholder)) },
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Lock,
@@ -129,7 +133,7 @@ fun ManualEntryDialog(
                         IconButton(onClick = { passwordVisible = !passwordVisible }) {
                             Icon(
                                 imageVector = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                                contentDescription = if (passwordVisible) "Hide password" else "Show password"
+                                contentDescription = if (passwordVisible) stringResource(R.string.hide_password_desc) else stringResource(R.string.show_password_desc)
                             )
                         }
                     },
@@ -176,7 +180,7 @@ fun ManualEntryDialog(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "Ask your teacher for the exact network name and password if you don't have the QR code.",
+                            text = stringResource(R.string.manual_entry_info),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -198,7 +202,7 @@ fun ManualEntryDialog(
                             .height(48.dp),
                         shape = RoundedCornerShape(24.dp)
                     ) {
-                        Text("Cancel")
+                        Text(stringResource(R.string.cancel_button))
                     }
 
                     // Connect Button
@@ -208,12 +212,12 @@ fun ManualEntryDialog(
                             var hasError = false
 
                             if (ssid.trim().isEmpty()) {
-                                ssidError = "Network name is required"
+                                ssidError = errorSsidRequired
                                 hasError = true
                             }
 
                             if (password.isEmpty()) {
-                                passwordError = "Password is required"
+                                passwordError = errorPasswordRequired
                                 hasError = true
                             }
 
@@ -233,7 +237,7 @@ fun ManualEntryDialog(
                             modifier = Modifier.size(18.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Connect")
+                        Text(stringResource(R.string.connect_button))
                     }
                 }
             }
@@ -244,4 +248,3 @@ fun ManualEntryDialog(
 private fun validateInput(ssid: String, password: String): Boolean {
     return ssid.trim().isNotEmpty() && password.isNotEmpty()
 }
-

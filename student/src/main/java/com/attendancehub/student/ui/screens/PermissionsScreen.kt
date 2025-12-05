@@ -14,9 +14,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.attendancehub.student.R
 
 @Composable
 fun PermissionsScreen(
@@ -76,7 +78,7 @@ fun PermissionsScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "Attendance Tracker",
+                text = stringResource(R.string.app_name_display),
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold
             )
@@ -84,7 +86,7 @@ fun PermissionsScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "We need a few permissions to help you take attendance",
+                text = stringResource(R.string.permissions_subtitle),
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -95,24 +97,24 @@ fun PermissionsScreen(
             // Permission cards
             PermissionCard(
                 icon = Icons.Default.Wifi,
-                title = "WiFi Access",
-                description = "Required to connect to teacher's network"
+                title = stringResource(R.string.permission_wifi_title),
+                description = stringResource(R.string.permission_wifi_desc)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             PermissionCard(
                 icon = Icons.Default.LocationOn,
-                title = "Location",
-                description = "Needed for WiFi scanning"
+                title = stringResource(R.string.permission_location_title),
+                description = stringResource(R.string.permission_location_desc)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             PermissionCard(
                 icon = Icons.Default.CameraAlt,
-                title = "Camera",
-                description = "To scan QR codes for quick connection"
+                title = stringResource(R.string.permission_camera_title),
+                description = stringResource(R.string.permission_camera_desc)
             )
         }
 
@@ -131,7 +133,7 @@ fun PermissionsScreen(
                 shape = RoundedCornerShape(28.dp)
             ) {
                 Text(
-                    text = "Grant Permissions",
+                    text = stringResource(R.string.grant_permissions_button),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -140,7 +142,7 @@ fun PermissionsScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "These permissions are required for the app to function properly",
+                text = stringResource(R.string.permissions_footer),
                 style = MaterialTheme.typography.bodySmall,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -202,4 +204,3 @@ private fun PermissionCard(
         }
     }
 }
-

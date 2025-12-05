@@ -1,6 +1,7 @@
 package org.wahid.attendancehub.ui.screens
 
 import android.Manifest
+import android.app.Dialog
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -20,7 +21,8 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun PermissionsScreen(
-    onGrantPermissions: () -> Unit
+    onGrantPermissions: () -> Unit,
+    showAppSettingDialog: ()-> Unit
 ) {
     // Permission launcher
     val permissionLauncher = rememberLauncherForActivityResult(
@@ -30,6 +32,9 @@ fun PermissionsScreen(
         val allGranted = permissions.values.all { it }
         if (allGranted) {
             onGrantPermissions()
+        }else{
+
+            showAppSettingDialog()
         }
     }
 

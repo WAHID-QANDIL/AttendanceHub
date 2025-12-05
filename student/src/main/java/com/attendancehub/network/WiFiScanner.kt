@@ -1,4 +1,4 @@
-package com.attendancehub.net
+package com.attendancehub.network
 
 import android.Manifest
 import android.content.BroadcastReceiver
@@ -9,11 +9,9 @@ import android.content.pm.PackageManager
 import android.net.wifi.WifiManager
 import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresPermission
 import androidx.core.content.ContextCompat
 import com.attendancehub.student.ui.screens.WifiNetwork
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 
@@ -47,6 +45,7 @@ class WiFiScanner(private val context: Context) {
 
         // Register receiver for scan results
         val receiver = object : BroadcastReceiver() {
+            @RequiresPermission(Manifest.permission.ACCESS_FINE_LOCATION)
             override fun onReceive(context: Context?, intent: Intent?) {
                 if (intent?.action == WifiManager.SCAN_RESULTS_AVAILABLE_ACTION) {
                     val success = intent.getBooleanExtra(WifiManager.EXTRA_RESULTS_UPDATED, false)
@@ -59,14 +58,14 @@ class WiFiScanner(private val context: Context) {
                             val signalLevel = WifiManager.calculateSignalLevel(result.level, 5)
                             val isSecured = result.capabilities.contains("WPA") ||
                                            result.capabilities.contains("WEP") ||
+                                           result.capabilities.contains("WEP2") ||
                                            result.capabilities.contains("PSK")
 
                             // Detect teacher networks (common patterns)
-                            val isTeacherNetwork = result.SSID.contains("DIRECT", ignoreCase = true) ||
-                                                  result.SSID.contains("Teacher", ignoreCase = true) ||
-                                                  result.SSID.contains("Class", ignoreCase = true) ||
-                                                  result.SSID.contains("AndroidShare", ignoreCase = true) ||
-                                                  result.SSID.contains("Attendance", ignoreCase = true)
+                            val isTeacherNetwork = result.SSID.contains("Teacher",      ignoreCase = true)  ||
+                                                   result.SSID.contains("Class",        ignoreCase = true)  ||
+                                                   result.SSID.contains("AndroidShare", ignoreCase = true)  ||
+                                                   result.SSID.contains("Attendance",   ignoreCase = true)
 
                             WifiNetwork(
                                 ssid = result.SSID,
@@ -115,7 +114,7 @@ class WiFiScanner(private val context: Context) {
             try {
                 context.unregisterReceiver(receiver)
             } catch (e: IllegalArgumentException) {
-                Log.d(TAG, "Receiver not registered")
+                Log.d(TAG, "Receiver not registered${e.message}")
                 // Receiver not registered
             }
         }
@@ -124,7 +123,7 @@ class WiFiScanner(private val context: Context) {
     /**
      * Check if location permission is granted (required for WiFi scanning on Android 6+)
      */
-    private fun hasLocationPermission(): Boolean {
+    fun hasLocationPermission(): Boolean {
         return ContextCompat.checkSelfPermission(
             context,
             Manifest.permission.ACCESS_FINE_LOCATION

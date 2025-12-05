@@ -10,7 +10,7 @@ import androidx.lifecycle.viewModelScope
 import com.attendancehub.api.AttendanceClient
 import com.attendancehub.models.ServerResponse
 import com.attendancehub.models.StudentAttendance
-import com.attendancehub.net.StudentHotspotManager
+import com.attendancehub.network.StudentHotspotConnectionManager
 import com.attendancehub.student.ui.screens.ConnectionStep
 import com.attendancehub.student.ui.screens.WifiNetwork
 import kotlinx.coroutines.Dispatchers
@@ -21,7 +21,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
+import kotlinx.serialization.InternalSerializationApi
 import java.util.UUID
+import androidx.core.content.edit
 
 sealed class StudentUiState {
     object Idle : StudentUiState()
@@ -31,16 +33,17 @@ sealed class StudentUiState {
     data class Scanning(val networks: List<WifiNetwork>) : StudentUiState()
     data class Connecting(
         val networkName: String,
-        val currentStep: ConnectionStep
+        val currentStep: ConnectionStep,
     ) : StudentUiState()
     data class Success(
         val networkName: String,
         val connectedDuration: String,
-        val markedAtTime: String
+        val markedAtTime: String,
     ) : StudentUiState()
     data class Error(val message: String) : StudentUiState()
 }
 
+@OptIn(InternalSerializationApi::class)
 class StudentViewModel(application: Application) : AndroidViewModel(application) {
     companion object {
         private const val MANUAL_CONNECTION_EXPIRY_MS = 2 * 60 * 60 * 1000L // 2 hours
@@ -52,9 +55,9 @@ class StudentViewModel(application: Application) : AndroidViewModel(application)
     }
 
     private val TAG = "StudentViewModel"
-    private val hotspotManager = StudentHotspotManager(application)
+    private val hotspotManager = StudentHotspotConnectionManager(application)
     private val attendanceClient = AttendanceClient(context = application)
-    private val wifiScanner = com.attendancehub.net.WiFiScanner(application)
+    private val wifiScanner = com.attendancehub.network.WiFiScanner(application)
     private val prefs = application.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
     private val _uiState = MutableStateFlow<StudentUiState>(StudentUiState.Idle)
@@ -82,11 +85,11 @@ class StudentViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    private fun hasStudentInfo(): Boolean {
-        return _firstName.value.isNotBlank() &&
-               _lastName.value.isNotBlank() &&
-               _studentId.value.isNotBlank()
-    }
+    private fun hasStudentInfo(): Boolean = listOf(
+            _firstName.value,
+           _lastName.value,
+           _studentId.value).any { it.isNotBlank() }
+
 
     fun saveStudentInfo(firstName: String, lastName: String, studentId: String) {
         _firstName.value = firstName
@@ -119,6 +122,13 @@ class StudentViewModel(application: Application) : AndroidViewModel(application)
 
                 if (networks.isEmpty()) {
                     Log.w(TAG, "No networks found - WiFi might be disabled")
+                    if (!wifiScanner.isWifiEnabled()) {
+                        wifiScanner.enableWifi()
+                        Log.w(TAG, "WiFi is turned ON programmatically")
+                    }else if (!wifiScanner.hasLocationPermission())  {
+                        //open app settings to grant location permission
+                        Log.e(TAG, "Location permission not granted")
+                    }
                 }
 
                 _availableNetworks.value = networks
@@ -276,6 +286,7 @@ class StudentViewModel(application: Application) : AndroidViewModel(application)
         _uiState.value = StudentUiState.QRScanning
     }
 
+    @OptIn(InternalSerializationApi::class)
     fun handleQRCode(qrData: com.attendancehub.models.QRData) {
         viewModelScope.launch {
             Log.d(TAG, "=== QR Code Handler Started ===")
@@ -305,7 +316,7 @@ class StudentViewModel(application: Application) : AndroidViewModel(application)
             Log.d(TAG, "Creating network object from QR data")
             val network = WifiNetwork(
                 ssid = qrData.ssid,
-                signalStrength = 4,
+                signalStrength = 5,
                 isSecured = true,
                 isTeacherNetwork = true
             )
@@ -328,6 +339,23 @@ class StudentViewModel(application: Application) : AndroidViewModel(application)
         _uiState.value = StudentUiState.Idle
     }
 
+    private fun resolveTeacherIp(context: Context): String {
+        val wifiManager =
+            context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        val dhcpInfo = wifiManager.dhcpInfo
+
+        val gatewayInt = dhcpInfo.gateway
+        if (gatewayInt == 0) {
+            // This usually means "not connected to Wi-Fi / hotspot"
+            throw IllegalStateException("Gateway IP is 0. Are you connected to the teacher hotspot?")
+        }
+
+        val gatewayIp = Formatter.formatIpAddress(gatewayInt)
+        Log.d(TAG, "Resolved teacher gateway IP: $gatewayIp")
+        return gatewayIp
+    }
+
+
     fun connectManually(ssid: String, password: String) {
         viewModelScope.launch {
             Log.d(TAG, "Manual connection - SSID: $ssid")
@@ -344,7 +372,7 @@ class StudentViewModel(application: Application) : AndroidViewModel(application)
             val qrData = com.attendancehub.models.QRData(
                 ssid = ssid,
                 password = password,
-                serverIp = "192.168.49.1", // Default IP
+                serverIp = "resolveServerIp()", //TODO: we need to dynamically pass a context that will the service run on,
                 port = 8080,
                 sessionId = java.util.UUID.randomUUID().toString(),
                 token = null,
@@ -360,7 +388,7 @@ class StudentViewModel(application: Application) : AndroidViewModel(application)
         var deviceId = prefs.getString(KEY_DEVICE_ID, null)
         if (deviceId == null) {
             deviceId = UUID.randomUUID().toString()
-            prefs.edit().putString(KEY_DEVICE_ID, deviceId).apply()
+            prefs.edit { putString(KEY_DEVICE_ID, deviceId) }
         }
         return deviceId
     }

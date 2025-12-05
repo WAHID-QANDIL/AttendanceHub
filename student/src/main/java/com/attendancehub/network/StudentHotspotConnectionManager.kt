@@ -1,4 +1,4 @@
-package com.attendancehub.net
+package com.attendancehub.network
 
 import android.content.Context
 import android.net.ConnectivityManager
@@ -24,7 +24,7 @@ import kotlinx.coroutines.withTimeoutOrNull
  * 5. All subsequent HTTP calls use the hotspot network
  * 6. Call disconnect() when done to release resources
  */
-class StudentHotspotManager(private val ctx: Context) : HotspotManager {
+class StudentHotspotConnectionManager(private val ctx: Context) : HotspotManager {
 
     private val TAG = "StudentHotspotManager"
     private var networkCallback: ConnectivityManager.NetworkCallback? = null

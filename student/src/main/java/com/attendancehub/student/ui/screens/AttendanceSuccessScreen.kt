@@ -10,9 +10,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.attendancehub.student.R
 
 @Composable
 fun AttendanceSuccessScreen(
@@ -42,13 +44,13 @@ fun AttendanceSuccessScreen(
             ) {
                 Column {
                     Text(
-                        text = "Connected",
+                        text = stringResource(R.string.connected_header),
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
                     )
                     Text(
-                        text = "Attendance marked",
+                        text = stringResource(R.string.attendance_marked_header),
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color.White.copy(alpha = 0.9f)
                     )
@@ -98,7 +100,7 @@ fun AttendanceSuccessScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "You're all set! 🎉",
+                text = stringResource(R.string.youre_all_set),
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold
             )
@@ -106,7 +108,7 @@ fun AttendanceSuccessScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Your attendance has been\nsuccessfully recorded",
+                text = stringResource(R.string.attendance_recorded_msg),
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -117,7 +119,7 @@ fun AttendanceSuccessScreen(
             // Info Cards
             InfoCard(
                 icon = Icons.Default.Wifi,
-                label = "Network",
+                label = stringResource(R.string.label_network),
                 value = networkName
             )
 
@@ -125,7 +127,7 @@ fun AttendanceSuccessScreen(
 
             InfoCard(
                 icon = Icons.Default.Schedule,
-                label = "Connected for",
+                label = stringResource(R.string.label_connected_for),
                 value = connectedDuration
             )
 
@@ -133,7 +135,7 @@ fun AttendanceSuccessScreen(
 
             InfoCard(
                 icon = Icons.Default.Add,
-                label = "Marked at",
+                label = stringResource(R.string.label_marked_at),
                 value = markedAtTime
             )
 
@@ -157,7 +159,7 @@ fun AttendanceSuccessScreen(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Disconnect",
+                    text = stringResource(R.string.disconnect_button),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -166,7 +168,7 @@ fun AttendanceSuccessScreen(
             Spacer(modifier = Modifier.height(12.dp))
 
             Text(
-                text = "Only disconnect if you need to leave early",
+                text = stringResource(R.string.disconnect_warning),
                 style = MaterialTheme.typography.bodySmall,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -185,7 +187,7 @@ fun AttendanceSuccessScreen(
             ) {
                 Icon(
                     imageVector = Icons.Default.QrCodeScanner,
-                    contentDescription = "Scan QR Code",
+                    contentDescription = stringResource(R.string.scan_qr_code),
                     modifier = Modifier.size(32.dp)
                 )
             }
@@ -244,4 +246,3 @@ fun InfoCard(
         }
     }
 }
-

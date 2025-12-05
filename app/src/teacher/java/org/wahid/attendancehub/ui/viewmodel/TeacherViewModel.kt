@@ -5,7 +5,7 @@ import android.graphics.Bitmap
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.attendancehub.net.HotspotInfo
+import com.attendancehub.network.HotspotInfo
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
 import com.google.zxing.qrcode.QRCodeWriter
@@ -15,13 +15,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.wahid.attendancehub.data.SessionRepository
 import org.wahid.attendancehub.data.SessionStudent
 import org.wahid.attendancehub.data.AttendanceSession
-import org.wahid.attendancehub.net.AttendanceServer
-import org.wahid.attendancehub.net.TeacherHotspotManager
+import org.wahid.attendancehub.network.AttendanceServer
+import org.wahid.attendancehub.network.TeacherHotspotManager
 import org.wahid.attendancehub.ui.screens.ConnectedStudent
 import java.io.File
 import java.text.SimpleDateFormat
@@ -41,6 +42,7 @@ sealed class TeacherUiState {
     data class Error(val message: String) : TeacherUiState()
 }
 
+@OptIn(InternalSerializationApi::class)
 class TeacherViewModel(application: Application) : AndroidViewModel(application) {
     private val TAG = "TeacherViewModel"
     private val hotspotManager = TeacherHotspotManager(application)
