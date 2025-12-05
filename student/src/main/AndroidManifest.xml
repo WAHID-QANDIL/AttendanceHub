@@ -13,12 +13,12 @@
     <uses-permission android:name="android.permission.NEARBY_WIFI_DEVICES" />
 
     <!-- Camera permission for QR code scanning -->
-    <uses-permission android:name="android.permission.CAMERA" />
+<!--    <uses-permission android:name="android.permission.CAMERA" />-->
 
     <!-- Optional: for better network discovery on Android 13+ -->
-    <uses-permission
-        android:name="android.permission.NEARBY_WIFI_DEVICES"
-        android:minSdkVersion="33" />
+<!--    <uses-permission-->
+<!--        android:name="android.permission.NEARBY_WIFI_DEVICES"-->
+<!--        android:minSdkVersion="33" />-->
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -29,7 +29,7 @@
     <application>
 
         <activity
-            android:name=".StudentMainActivity"
+            android:name="com.attendancehub.StudentMainActivity"
             android:networkSecurityConfig="@xml/network_security_config"
             android:exported="true"
             android:theme="@style/Theme.AttendanceHub"
