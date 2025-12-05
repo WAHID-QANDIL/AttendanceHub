@@ -13,9 +13,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.attendancehub.student.R
 
 @Composable
 fun ConnectingScreen(
@@ -63,7 +65,7 @@ fun ConnectingScreen(
         Spacer(modifier = Modifier.height(32.dp))
 
         Text(
-            text = "Connecting...",
+            text = stringResource(R.string.connecting_title),
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold
         )
@@ -71,7 +73,7 @@ fun ConnectingScreen(
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "Establishing connection to\n$networkName",
+            text = stringResource(R.string.establishing_connection_fmt, networkName),
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -102,7 +104,7 @@ fun ConnectingScreen(
                     )
                     Spacer(modifier = Modifier.width(12.dp))
                     Text(
-                        text = "Please approve the WiFi connection request when the system dialog appears.",
+                        text = stringResource(R.string.authenticating_info),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -114,7 +116,7 @@ fun ConnectingScreen(
         // Connection Steps
         ConnectionStepItem(
             icon = Icons.Default.Wifi,
-            text = "Network found",
+            text = stringResource(R.string.step_network_found),
             isCompleted = currentStep.ordinal >= ConnectionStep.NETWORK_FOUND.ordinal,
             isActive = currentStep == ConnectionStep.NETWORK_FOUND
         )
@@ -123,7 +125,7 @@ fun ConnectingScreen(
 
         ConnectionStepItem(
             icon = Icons.Default.Lock,
-            text = "Authenticating...",
+            text = stringResource(R.string.step_authenticating),
             isCompleted = currentStep.ordinal >= ConnectionStep.AUTHENTICATING.ordinal,
             isActive = currentStep == ConnectionStep.AUTHENTICATING
         )
@@ -132,7 +134,7 @@ fun ConnectingScreen(
 
         ConnectionStepItem(
             icon = Icons.Default.PersonAdd,
-            text = "Registering attendance",
+            text = stringResource(R.string.step_registering),
             isCompleted = currentStep.ordinal >= ConnectionStep.REGISTERING.ordinal,
             isActive = currentStep == ConnectionStep.REGISTERING
         )
@@ -206,4 +208,3 @@ enum class ConnectionStep {
     AUTHENTICATING,
     REGISTERING
 }
-

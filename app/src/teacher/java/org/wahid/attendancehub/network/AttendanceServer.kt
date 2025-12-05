@@ -1,4 +1,4 @@
-package org.wahid.attendancehub.net
+package org.wahid.attendancehub.network
 
 import android.util.Log
 import com.attendancehub.models.StudentAttendance
@@ -6,6 +6,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.json.Json
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -19,14 +20,16 @@ import java.net.SocketTimeoutException
  * Simple HTTP server using ServerSocket that runs on teacher's device to receive student attendance
  *
  * Endpoints:
- * - POST /join   - Students submit attendance data
- * - GET  /status - Health check
+ * - POST /join - Students submit attendance data
+ * - GET /status - Health check
  */
 class AttendanceServer(private val port: Int = 8080) {
 
     private val TAG = "AttendanceServer"
 
+    @OptIn(InternalSerializationApi::class)
     private val _connectedStudents = MutableStateFlow<List<StudentAttendance>>(emptyList())
+    @OptIn(InternalSerializationApi::class)
     val connectedStudents: StateFlow<List<StudentAttendance>> = _connectedStudents.asStateFlow()
 
     private var serverSocket: ServerSocket? = null
@@ -45,8 +48,7 @@ class AttendanceServer(private val port: Int = 8080) {
     fun startServer(): Result<Unit> {
         return try {
             serverSocket = ServerSocket(port).apply {
-                // 1 second timeout so accept() wakes up periodically and we can stop gracefully
-                soTimeout = 1000
+                soTimeout = 1000 // 1 second timeout to allow checking isActive
             }
             Log.d(TAG, "Server socket created on port $port")
             Log.d(TAG, "Server listening on 0.0.0.0:$port (all interfaces)")
@@ -57,23 +59,25 @@ class AttendanceServer(private val port: Int = 8080) {
                 while (isActive) {
                     try {
                         val client = serverSocket?.accept()
+                        Log.d(TAG, "Client is null: ${client == null}")
                         if (client != null) {
                             Log.d(TAG, "Client connected from ${client.inetAddress.hostAddress}")
                             handleClient(client)
                         }
                     } catch (e: SocketTimeoutException) {
-                        // Normal: just a timeout so we can re-check isActive
+                        // Timeout - continue loop (allows checking isActive)
                     } catch (e: Exception) {
                         if (isActive) {
                             Log.e(TAG, "Error accepting client", e)
                         }
                     }
-                    Log.d(TAG, "Server accept loop is still active")
+                Log.d(TAG, "Server accept loop is still active")
                 }
                 Log.d(TAG, "Server accept loop ended")
             }
 
             Log.d(TAG, "Attendance server started successfully on port $port")
+            Log.d(TAG, "Students can connect to: http://192.168.49.1:$port/join")
             Result.success(Unit)
         } catch (e: Exception) {
             Log.e(TAG, "Failed to start server", e)
@@ -103,7 +107,7 @@ class AttendanceServer(private val port: Int = 8080) {
                 var contentLength = 0
                 while (reader.readLine().also { line = it } != null) {
                     if (line!!.isEmpty()) break
-                    val headerParts = line.split(": ", limit = 2)
+                    val headerParts = line!!.split(": ", limit = 2)
                     if (headerParts.size == 2) {
                         headers[headerParts[0]] = headerParts[1]
                         if (headerParts[0].equals("Content-Length", ignoreCase = true)) {
@@ -112,14 +116,17 @@ class AttendanceServer(private val port: Int = 8080) {
                     }
                 }
 
+                // Handle routes
                 when {
                     method == "POST" && path == "/join" -> {
-                        // Read body of exactly Content-Length chars
+
+
+                        // Read body
                         val body = CharArray(contentLength)
                         reader.read(body, 0, contentLength)
                         val bodyString = String(body)
 
-                        Log.d(TAG, "POST /join body: $bodyString")
+                        Log.d(TAG, "POST: method $body")
                         handleJoinRequest(bodyString, writer)
                     }
 
@@ -128,20 +135,17 @@ class AttendanceServer(private val port: Int = 8080) {
                     }
 
                     else -> {
-                        sendResponse(
-                            writer,
-                            404,
-                            "Not Found",
-                            """{"error":"Endpoint not found"}"""
-                        )
+                        sendResponse(writer, 404, "Not Found", """{"error":"Endpoint not found"}""")
                     }
                 }
+
+                client.close()
             } catch (e: Exception) {
                 Log.e(TAG, "Error handling client", e)
             } finally {
                 try {
                     client.close()
-                    Log.d(TAG, "Client socket closed")
+                    Log.d(TAG, "client socket closed")
                 } catch (e: Exception) {
                     Log.e(TAG, "Error closing client socket", e)
                 }
@@ -149,6 +153,7 @@ class AttendanceServer(private val port: Int = 8080) {
         }
     }
 
+    @OptIn(InternalSerializationApi::class)
     private fun handleJoinRequest(body: String, writer: PrintWriter) {
         try {
             Log.d(TAG, "=== JOIN REQUEST RECEIVED ===")
@@ -163,7 +168,8 @@ class AttendanceServer(private val port: Int = 8080) {
             Log.d(TAG, "Device ID: ${studentAttendance.deviceId}")
             Log.d(TAG, "Timestamp: ${studentAttendance.timestamp}")
 
-            // Check for duplicate by deviceId or studentId
+            // Check for duplicate
+            Log.d(TAG, "Current students count: ${_connectedStudents.value.size}")
             val isDuplicate = _connectedStudents.value.any {
                 it.deviceId == studentAttendance.deviceId ||
                         it.studentId == studentAttendance.studentId
@@ -178,15 +184,18 @@ class AttendanceServer(private val port: Int = 8080) {
                     """{"status":"error","message":"Already registered"}"""
                 )
             } else {
+                // Add to list
                 val oldSize = _connectedStudents.value.size
                 _connectedStudents.value += studentAttendance
                 val newSize = _connectedStudents.value.size
 
                 Log.d(TAG, "Student added successfully!")
                 Log.d(TAG, "Students count: $oldSize → $newSize")
+                Log.d(TAG, "StateFlow emitted: ${_connectedStudents.value.size} students")
 
+                // Log all current students
                 _connectedStudents.value.forEachIndexed { index, student ->
-                    Log.d(TAG, "[$index] ${student.name} - ${student.studentId}")
+                    Log.d(TAG, "  [$index] ${student.name} - ${student.studentId}")
                 }
 
                 sendResponse(
@@ -198,6 +207,9 @@ class AttendanceServer(private val port: Int = 8080) {
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error processing attendance", e)
+            Log.e(TAG, "Error type: ${e.javaClass.simpleName}")
+            Log.e(TAG, "Error message: ${e.message}")
+            e.printStackTrace()
             sendResponse(
                 writer,
                 500,
@@ -207,6 +219,7 @@ class AttendanceServer(private val port: Int = 8080) {
         }
     }
 
+    @OptIn(InternalSerializationApi::class)
     private fun handleStatusRequest(writer: PrintWriter) {
         val response =
             """{"status":"ok","connectedStudents":${_connectedStudents.value.size},"timestamp":${System.currentTimeMillis()}}"""
@@ -236,6 +249,7 @@ class AttendanceServer(private val port: Int = 8080) {
     /**
      * Clear all connected students
      */
+    @OptIn(InternalSerializationApi::class)
     fun clearStudents() {
         _connectedStudents.value = emptyList()
         Log.d(TAG, "Cleared student list")
@@ -244,5 +258,6 @@ class AttendanceServer(private val port: Int = 8080) {
     /**
      * Get current student count
      */
+    @OptIn(InternalSerializationApi::class)
     fun getStudentCount(): Int = _connectedStudents.value.size
 }

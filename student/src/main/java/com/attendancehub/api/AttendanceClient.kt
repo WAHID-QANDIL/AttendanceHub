@@ -1,3 +1,5 @@
+@file:OptIn(InternalSerializationApi::class)
+
 package com.attendancehub.api
 
 import android.content.Context
@@ -8,6 +10,7 @@ import com.attendancehub.models.ServerResponse
 import com.attendancehub.models.StudentAttendance
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.BufferedReader
