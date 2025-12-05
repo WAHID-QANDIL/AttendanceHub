@@ -1,12 +1,16 @@
+@file:OptIn(InternalSerializationApi::class)
+
 package com.attendancehub.student.ui.screens
 
 import android.util.Log
 import androidx.camera.core.CameraSelector
+import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
@@ -27,17 +31,18 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.attendancehub.models.QRData
 import com.google.mlkit.vision.barcode.BarcodeScanning
-import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
+import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.json.Json
 import java.util.concurrent.Executors
 
+@androidx.annotation.OptIn(ExperimentalGetImage::class)
 @Composable
 fun QRScannerScreen(
     onQRCodeScanned: (QRData) -> Unit,
-    onClose: () -> Unit
+    onClose: () -> Unit,
 ) {
-    val context = LocalContext.current
+//    val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     var hasFlash by remember { mutableStateOf(false) }
     var flashEnabled by remember { mutableStateOf(false) }
@@ -83,8 +88,8 @@ fun QRScannerScreen(
                         val imageAnalyzer = ImageAnalysis.Builder()
                             .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                             .build()
-                            .also {
-                                it.setAnalyzer(cameraExecutor) { imageProxy ->
+                            .also { imageAnalysis ->
+                                imageAnalysis.setAnalyzer(cameraExecutor) { imageProxy ->
                                     if (!isScanning) {
                                         imageProxy.close()
                                         return@setAnalyzer
@@ -105,30 +110,55 @@ fun QRScannerScreen(
                                                     // ML Kit may detect JSON QR codes as TYPE_URL (9) instead of TYPE_TEXT
                                                     barcode.rawValue?.let { qrContent ->
                                                         try {
-                                                            Log.d("QRScanner", "QR Code detected (type=${barcode.valueType}): $qrContent")
+                                                            Log.d(
+                                                                "QRScanner",
+                                                                "QR Code detected (type=${barcode.valueType}): $qrContent"
+                                                            )
 
                                                             // Try to parse as JSON QRData
-                                                            val qrData = Json.decodeFromString<QRData>(qrContent)
+                                                            val qrData =
+                                                                Json.decodeFromString<QRData>(
+                                                                    qrContent
+                                                                )
 
-                                                            Log.d("QRScanner", "QR parsed - SSID: ${qrData.ssid}, Password: ${qrData.password}")
+                                                            Log.d(
+                                                                "QRScanner",
+                                                                "QR parsed - SSID: ${qrData.ssid}, Password: ${qrData.password}"
+                                                            )
 
                                                             // Validate QR data
                                                             if (qrData.ssid.isNotEmpty() && qrData.password.isNotEmpty()) {
-                                                                Log.d("QRScanner", "QR validated successfully, calling onQRCodeScanned")
+                                                                Log.d(
+                                                                    "QRScanner",
+                                                                    "QR validated successfully, calling onQRCodeScanned"
+                                                                )
                                                                 isScanning = false
-                                                                successMessage = "QR Code detected! Connecting..."
+                                                                successMessage =
+                                                                    "QR Code detected! Connecting..."
                                                                 onQRCodeScanned(qrData)
                                                             } else {
-                                                                Log.w("QRScanner", "QR data validation failed - SSID or password empty")
-                                                                errorMessage = "Invalid QR data - missing network info"
+                                                                Log.w(
+                                                                    "QRScanner",
+                                                                    "QR data validation failed - SSID or password empty"
+                                                                )
+                                                                errorMessage =
+                                                                    "Invalid QR data - missing network info"
                                                             }
                                                         } catch (e: Exception) {
-                                                            Log.e("QRScanner", "Failed to parse QR code: ${e.message}", e)
+                                                            Log.e(
+                                                                "QRScanner",
+                                                                "Failed to parse QR code: ${e.message}",
+                                                                e
+                                                            )
                                                             // Only show error if we can't parse as JSON (ignore non-JSON QR codes)
                                                             if (qrContent.trim().startsWith("{")) {
-                                                                errorMessage = "Invalid QR code format: ${e.message}"
+                                                                errorMessage =
+                                                                    "Invalid QR code format: ${e.message}"
                                                             } else {
-                                                                Log.d("QRScanner", "Ignoring non-JSON QR code")
+                                                                Log.d(
+                                                                    "QRScanner",
+                                                                    "Ignoring non-JSON QR code"
+                                                                )
                                                             }
                                                         }
                                                     }
@@ -233,14 +263,18 @@ fun QRScannerScreen(
                     .fillMaxWidth()
                     .padding(horizontal = 24.dp, vertical = 16.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color.White.copy(alpha = 0.9f)
+                    containerColor = Color.Green.copy(alpha = 0.9f)
                 ),
                 shape = RoundedCornerShape(16.dp)
             ) {
                 Column(
-                    modifier = Modifier.padding(20.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Bottom,
+                    modifier = Modifier
+                        .padding(20.dp)
+                        .padding(vertical = 16.dp),
+
+                    ) {
                     Text(
                         text = "Scan Teacher's QR Code",
                         style = MaterialTheme.typography.titleLarge,
@@ -273,7 +307,10 @@ fun QRScannerScreen(
                     .aspectRatio(1f),
                 color = Color.Transparent,
                 shape = RoundedCornerShape(24.dp),
-                border = androidx.compose.foundation.BorderStroke(4.dp, Color.White.copy(alpha = 0.8f))
+                border = androidx.compose.foundation.BorderStroke(
+                    4.dp,
+                    Color.Green.copy(alpha = 0.8f)
+                )
             ) {}
         }
 
