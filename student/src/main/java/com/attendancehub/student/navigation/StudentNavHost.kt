@@ -1,3 +1,5 @@
+@file:OptIn(InternalSerializationApi::class)
+
 package com.attendancehub.student.navigation
 
 import androidx.compose.foundation.layout.Box
@@ -28,6 +30,7 @@ import com.attendancehub.student.ui.screens.QRScannerScreen
 import com.attendancehub.student.ui.screens.StudentNetworkScanScreen
 import com.attendancehub.student.viewmodel.StudentUiState
 import com.attendancehub.student.viewmodel.StudentViewModel
+import kotlinx.serialization.InternalSerializationApi
 
 @Composable
 fun StudentNavHost(
