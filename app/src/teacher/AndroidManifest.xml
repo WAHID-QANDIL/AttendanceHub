@@ -11,7 +11,7 @@
         <activity
             android:name=".TeacherMainActivity"
             android:exported="true"
-            android:icon="@drawable/ic_launcher_foreground"
+            android:icon="@drawable/app_logo"
             android:theme="@style/Theme.AttendanceHub">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
