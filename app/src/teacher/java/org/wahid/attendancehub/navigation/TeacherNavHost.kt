@@ -1,8 +1,13 @@
 package org.wahid.attendancehub.navigation
 
 import android.util.Log
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -40,28 +45,22 @@ fun TeacherNavHost(
         enterTransition = {
             slideIntoContainer(
                 towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                animationSpec = tween(400)
+                animationSpec = tween(
+                    durationMillis = 1000,
+                    easing = FastOutSlowInEasing
+                )
             )
         },
         exitTransition = {
             slideOutOfContainer(
-                towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                animationSpec = tween(400)
-            )
-        },
+                towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                animationSpec = tween(
+                    durationMillis = 100,
+                    easing = LinearOutSlowInEasing
+                )
 
-        popExitTransition = {
-            slideOutOfContainer(
-                towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                animationSpec = tween(400)
             )
         },
-        popEnterTransition = {
-            slideIntoContainer(
-                towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                animationSpec = tween(400)
-            )
-        }
 
     ) {
         // Permissions Screen
@@ -88,13 +87,25 @@ fun TeacherNavHost(
                     }
                     viewModel.startHotspot()
                 },
-                todaySessionsCount = 3,
-                lastSessionTime = "2 hours ago"
             )
         }
 
         // Hotspot Active Screen
         composable(TeacherScreens.HotspotActive.route) {
+
+
+            fun navigateToHomeAndStopHotspot() {
+                viewModel.stopHotspot()
+                navController.navigate(TeacherScreens.Home.route) {
+                    popUpTo(TeacherScreens.Home.route) { inclusive = true }
+                }
+            }
+            //Disable back press
+            BackHandler(enabled = true) {
+                // Do nothing on back press
+            }
+
+
             val currentUiState by viewModel.uiState.collectAsState()
             val connectedStudents by viewModel.connectedStudents.collectAsState()
 
@@ -117,10 +128,7 @@ fun TeacherNavHost(
                         qrBitmap = state.qrBitmap,
                         connectedStudents = connectedStudents,
                         onEndSession = {
-                            viewModel.stopHotspot()
-                            navController.navigate(TeacherScreens.Home.route) {
-                                popUpTo(TeacherScreens.Home.route) { inclusive = true }
-                            }
+                            navigateToHomeAndStopHotspot()
                         },
                         onDownloadList = {
                             viewModel.downloadStudentList()

@@ -148,7 +148,7 @@ fun HotspotActiveScreen(
                 }
             }
 
-            Divider(modifier = Modifier.padding(horizontal = 20.dp))
+            HorizontalDivider(modifier = Modifier.padding(horizontal = 20.dp))
 
             Text(
                 text = "Scan QR code to connect automatically",
