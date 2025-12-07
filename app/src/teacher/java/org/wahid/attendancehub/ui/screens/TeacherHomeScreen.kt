@@ -18,8 +18,6 @@ import org.wahid.attendancehub.R
 @Composable
 fun TeacherHomeScreen(
     onEnableHotspot: () -> Unit,
-    todaySessionsCount: Int = 3,
-    lastSessionTime: String = "2 hours ago",
 ) {
     Column(
         modifier = Modifier

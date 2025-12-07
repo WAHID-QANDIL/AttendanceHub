@@ -1,10 +1,10 @@
 package org.wahid.attendancehub.navigation
 
 import android.util.Log
-import androidx.activity.OnBackPressedCallback
-import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
@@ -44,31 +44,23 @@ fun TeacherNavHost(
         startDestination = if (hasPermissions) TeacherScreens.Home.route else TeacherScreens.Permissions.route,
         enterTransition = {
             slideIntoContainer(
-                towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                animationSpec = tween(400)
+                towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                animationSpec = tween(
+                    durationMillis = 1000,
+                    easing = FastOutSlowInEasing
+                )
             )
         },
-//        exitTransition = {
-//            slideOutOfContainer(
-//                towards = AnimatedContentTransitionScope.SlideDirection.Down,
-//                animationSpec = tween(400)
-//            )
-//        },
-
-        popExitTransition = {
-            scaleOut(
-                animationSpec = tween(durationMillis = 700, easing = FastOutSlowInEasing),
-                targetScale = .9f,
+        exitTransition = {
+            slideOutOfContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                animationSpec = tween(
+                    durationMillis = 100,
+                    easing = LinearOutSlowInEasing
+                )
 
             )
-
         },
-        popEnterTransition = {
-            scaleIn(
-               animationSpec = tween(durationMillis = 700, easing = FastOutSlowInEasing),
-                initialScale = .9f,
-            )
-        }
 
     ) {
         // Permissions Screen
@@ -95,8 +87,6 @@ fun TeacherNavHost(
                     }
                     viewModel.startHotspot()
                 },
-                todaySessionsCount = 3,
-                lastSessionTime = "2 hours ago"
             )
         }
 
@@ -110,17 +100,11 @@ fun TeacherNavHost(
                     popUpTo(TeacherScreens.Home.route) { inclusive = true }
                 }
             }
-
-            val onCallBackPressedCallback: OnBackPressedCallback = object : OnBackPressedCallback(true) {
-                override fun handleOnBackPressed() {
-                    // Custom back press handling, stop hotspot and navigate to home
-                    // When it was NOT handled, pressing back would just minimize,and navigate back to home screen, but keep the hotspot active and this produce a run time crash when trying to start hotspot again
-                    navigateToHomeAndStopHotspot()
-                }
+            //Disable back press
+            BackHandler(enabled = true) {
+                // Do nothing on back press
             }
-            LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher?.addCallback(
-                onCallBackPressedCallback
-            )
+
 
             val currentUiState by viewModel.uiState.collectAsState()
             val connectedStudents by viewModel.connectedStudents.collectAsState()
