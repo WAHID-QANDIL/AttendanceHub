@@ -2,7 +2,15 @@ package org.wahid.attendancehub.navigation
 
 import android.util.Log
 import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.EaseIn
+import androidx.compose.animation.core.EaseOutExpo
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -39,7 +47,7 @@ fun TeacherNavHost(
         startDestination = if (hasPermissions) TeacherScreens.Home.route else TeacherScreens.Permissions.route,
         enterTransition = {
             slideIntoContainer(
-                towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                towards = AnimatedContentTransitionScope.SlideDirection.Left,
                 animationSpec = tween(400)
             )
         },
@@ -51,15 +59,17 @@ fun TeacherNavHost(
         },
 
         popExitTransition = {
-            slideOutOfContainer(
-                towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                animationSpec = tween(400)
+            scaleOut(
+                animationSpec = tween(durationMillis = 700, easing = FastOutSlowInEasing),
+                targetScale = .9f,
+
             )
+
         },
         popEnterTransition = {
-            slideIntoContainer(
-                towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                animationSpec = tween(400)
+            scaleIn(
+               animationSpec = tween(durationMillis = 700, easing = FastOutSlowInEasing),
+                initialScale = .9f,
             )
         }
 
