@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Attendance Hub</string>
+    <string name="permissions_required">Permissions Required</string>
+    <string name="please_grant_the_necessary_permissions_in_settings_to_continue_using_the_app">Please grant the necessary permissions in Settings to continue using the app.\n\n</string>
+    <string name="required_permissions">Required Permissions:\n</string>
+    <string name="location_access">- Location Access\n</string>
+    <string name="wifi_state_access">- WiFi State Access</string>
 </resources>
