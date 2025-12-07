@@ -30,7 +30,6 @@ import org.wahid.attendancehub.ui.viewmodel.TeacherViewModel
 class TeacherMainActivity : ComponentActivity() {
     private val viewModel by viewModels<TeacherViewModel>()
     private var hasPermissions: Boolean = false
-    private val permissionsDeclined = false
     val TAG = "Callbacks"
 
     private val permissionLauncher =

@@ -1,13 +1,10 @@
 package org.wahid.attendancehub.navigation
 
 import android.util.Log
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.AnimatedContentTransitionScope
-import androidx.compose.animation.core.EaseIn
-import androidx.compose.animation.core.EaseOutExpo
-import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
@@ -51,12 +48,12 @@ fun TeacherNavHost(
                 animationSpec = tween(400)
             )
         },
-        exitTransition = {
-            slideOutOfContainer(
-                towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                animationSpec = tween(400)
-            )
-        },
+//        exitTransition = {
+//            slideOutOfContainer(
+//                towards = AnimatedContentTransitionScope.SlideDirection.Down,
+//                animationSpec = tween(400)
+//            )
+//        },
 
         popExitTransition = {
             scaleOut(
@@ -105,6 +102,21 @@ fun TeacherNavHost(
 
         // Hotspot Active Screen
         composable(TeacherScreens.HotspotActive.route) {
+
+            val onCallBackPressedCallback: OnBackPressedCallback = object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    // Custom back press handling, stop hotspot and navigate to home
+                    // When it was NOT handled, pressing back would just minimize,and navigate back to home screen, but keep the hotspot active and this produce a run time crash when trying to start hotspot again
+                    viewModel.stopHotspot()
+                    navController.navigate(TeacherScreens.Home.route) {
+                        popUpTo(TeacherScreens.Home.route) { inclusive = true }
+                    }
+                }
+            }
+            LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher?.addCallback(
+                onCallBackPressedCallback
+            )
+
             val currentUiState by viewModel.uiState.collectAsState()
             val connectedStudents by viewModel.connectedStudents.collectAsState()
 
