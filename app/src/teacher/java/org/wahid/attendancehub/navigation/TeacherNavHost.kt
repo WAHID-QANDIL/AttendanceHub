@@ -103,14 +103,19 @@ fun TeacherNavHost(
         // Hotspot Active Screen
         composable(TeacherScreens.HotspotActive.route) {
 
+
+            fun navigateToHomeAndStopHotspot() {
+                viewModel.stopHotspot()
+                navController.navigate(TeacherScreens.Home.route) {
+                    popUpTo(TeacherScreens.Home.route) { inclusive = true }
+                }
+            }
+
             val onCallBackPressedCallback: OnBackPressedCallback = object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     // Custom back press handling, stop hotspot and navigate to home
                     // When it was NOT handled, pressing back would just minimize,and navigate back to home screen, but keep the hotspot active and this produce a run time crash when trying to start hotspot again
-                    viewModel.stopHotspot()
-                    navController.navigate(TeacherScreens.Home.route) {
-                        popUpTo(TeacherScreens.Home.route) { inclusive = true }
-                    }
+                    navigateToHomeAndStopHotspot()
                 }
             }
             LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher?.addCallback(
@@ -139,10 +144,7 @@ fun TeacherNavHost(
                         qrBitmap = state.qrBitmap,
                         connectedStudents = connectedStudents,
                         onEndSession = {
-                            viewModel.stopHotspot()
-                            navController.navigate(TeacherScreens.Home.route) {
-                                popUpTo(TeacherScreens.Home.route) { inclusive = true }
-                            }
+                            navigateToHomeAndStopHotspot()
                         },
                         onDownloadList = {
                             viewModel.downloadStudentList()
