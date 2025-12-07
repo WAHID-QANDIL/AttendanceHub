@@ -25,7 +25,6 @@ import com.attendancehub.student.navigation.LocalNavController
 import com.attendancehub.student.navigation.StudentScreen
 import com.attendancehub.student.ui.screens.permission.composables.Logo
 import com.attendancehub.student.ui.screens.permission.composables.PermissionCard
-import com.attendancehub.student.ui.screens.permission.composables.PermissionEffect
 import com.attendancehub.utils.ObserveAsEffect
 import org.koin.androidx.compose.koinViewModel
 
