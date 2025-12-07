@@ -9,19 +9,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import org.wahid.attendancehub.R
 
 @Composable
 fun TeacherHomeScreen(
     onEnableHotspot: () -> Unit,
     todaySessionsCount: Int = 3,
-    lastSessionTime: String = "2 hours ago"
+    lastSessionTime: String = "2 hours ago",
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp)
+            .padding(horizontal = 12.dp)
+            .statusBarsPadding()
     ) {
         // Header
         Card(
@@ -35,13 +39,13 @@ fun TeacherHomeScreen(
                 modifier = Modifier.padding(24.dp)
             ) {
                 Text(
-                    text = "Welcome Back!",
+                    text = stringResource(R.string.welcome_back),
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
                     color = Color.White
                 )
                 Text(
-                    text = "Ready to take attendance?",
+                    text = stringResource(R.string.ready_to_take_attendance),
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.White.copy(alpha = 0.9f)
                 )
@@ -50,7 +54,7 @@ fun TeacherHomeScreen(
 
         // Main card
         Card(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxSize(),
             shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp),
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surface
@@ -80,7 +84,7 @@ fun TeacherHomeScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "Mobile Hotspot",
+                    text = stringResource(R.string.mobile_hotspot),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -88,7 +92,7 @@ fun TeacherHomeScreen(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Enable hotspot to start taking attendance",
+                    text = stringResource(R.string.enable_hotspot_to_start_taking_attendance),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -103,7 +107,7 @@ fun TeacherHomeScreen(
                     shape = RoundedCornerShape(28.dp)
                 ) {
                     Text(
-                        text = "Enable Hotspot",
+                        text = stringResource(R.string.enable_hotspot),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -131,7 +135,7 @@ fun TeacherHomeScreen(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "What happens next:",
+                                text = stringResource(R.string.what_happens_next),
                                 style = MaterialTheme.typography.labelMedium,
                                 fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.primary
@@ -141,7 +145,7 @@ fun TeacherHomeScreen(
                         Spacer(modifier = Modifier.height(12.dp))
 
                         Text(
-                            text = "1. Your phone becomes a hotspot\n2. Students connect to your network\n3. Attendance is recorded automatically",
+                            text = stringResource(R.string._1_your_phone_becomes_a_hotspot_2_students_connect_to_your_network_3_attendance_is_recorded_automatically),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -150,32 +154,32 @@ fun TeacherHomeScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
-
-        // Quick Stats
-        Text(
-            text = "Quick Stats",
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.SemiBold
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        StatCard(
-            icon = Icons.Default.People,
-            title = "Today's Sessions",
-            value = "$todaySessionsCount sessions",
-            iconColor = Color(0xFF9C27B0)
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        StatCard(
-            icon = Icons.Default.Schedule,
-            title = "Last Session",
-            value = lastSessionTime,
-            iconColor = Color(0xFF4CAF50)
-        )
+//        Spacer(modifier = Modifier.height(32.dp))
+//
+//        // Quick Stats
+//        Text(
+//            text = "Quick Stats",
+//            style = MaterialTheme.typography.titleMedium,
+//            fontWeight = FontWeight.SemiBold
+//        )
+//
+//        Spacer(modifier = Modifier.height(16.dp))
+//
+//        StatCard(
+//            icon = Icons.Default.People,
+//            title = "Today's Sessions",
+//            value = "$todaySessionsCount sessions",
+//            iconColor = Color(0xFF9C27B0)
+//        )
+//
+//        Spacer(modifier = Modifier.height(12.dp))
+//
+//        StatCard(
+//            icon = Icons.Default.Schedule,
+//            title = "Last Session",
+//            value = lastSessionTime,
+//            iconColor = Color(0xFF4CAF50)
+//        )
     }
 }
 

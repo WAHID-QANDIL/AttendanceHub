@@ -1,10 +1,20 @@
 package org.wahid.attendancehub.navigation
 
 import android.util.Log
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -21,40 +31,46 @@ fun TeacherNavHost(
     navController: NavHostController = rememberNavController(),
     viewModel: TeacherViewModel = viewModel(),
     hasPermissions: Boolean = false,
-    showAppSettingDialog: ()-> Unit
+    showAppSettingDialog: () -> Unit,
 ) {
-    val uiState by viewModel.uiState.collectAsState()
-
-    // Navigate based on UI state
-    when (uiState) {
-        is TeacherUiState.HotspotActive -> {
-            if (navController.currentDestination?.route != TeacherScreen.HotspotActive.route) {
-                navController.navigate(TeacherScreen.HotspotActive.route) {
-                    popUpTo(TeacherScreen.Home.route) { inclusive = true }
-                }
-            }
-        }
-        is TeacherUiState.Idle -> {
-            if (navController.currentDestination?.route == TeacherScreen.HotspotActive.route) {
-                navController.navigate(TeacherScreen.Home.route) {
-                    popUpTo(TeacherScreen.Home.route) { inclusive = true }
-                }
-            }
-        }
-        else -> { /* No navigation change */ }
-    }
 
     NavHost(
         navController = navController,
-        startDestination = if (hasPermissions) TeacherScreen.Home.route else TeacherScreen.Permissions.route
+        startDestination = if (hasPermissions) TeacherScreens.Home.route else TeacherScreens.Permissions.route,
+        enterTransition = {
+            slideIntoContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                animationSpec = tween(400)
+            )
+        },
+        exitTransition = {
+            slideOutOfContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                animationSpec = tween(400)
+            )
+        },
+
+        popExitTransition = {
+            slideOutOfContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                animationSpec = tween(400)
+            )
+        },
+        popEnterTransition = {
+            slideIntoContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                animationSpec = tween(400)
+            )
+        }
+
     ) {
         // Permissions Screen
-        composable(TeacherScreen.Permissions.route) {
+        composable(TeacherScreens.Permissions.route) {
             PermissionsScreen(
                 onGrantPermissions = {
                     // After permissions are granted, navigate to home
-                    navController.navigate(TeacherScreen.Home.route) {
-                        popUpTo(TeacherScreen.Permissions.route) { inclusive = true }
+                    navController.navigate(TeacherScreens.Home.route) {
+                        popUpTo(TeacherScreens.Permissions.route) { inclusive = true }
                     }
                 },
                 showAppSettingDialog = showAppSettingDialog
@@ -62,11 +78,15 @@ fun TeacherNavHost(
         }
 
         // Home/Welcome Screen
-        composable(TeacherScreen.Home.route) {
+        composable(TeacherScreens.Home.route) {
             TeacherHomeScreen(
                 onEnableHotspot = {
+                    navController.navigate(TeacherScreens.HotspotActive.route) {
+                        popUpTo(
+                            TeacherScreens.Home.route
+                        )
+                    }
                     viewModel.startHotspot()
-                    // Navigation handled by state observer above
                 },
                 todaySessionsCount = 3,
                 lastSessionTime = "2 hours ago"
@@ -74,31 +94,59 @@ fun TeacherNavHost(
         }
 
         // Hotspot Active Screen
-        composable(TeacherScreen.HotspotActive.route) {
+        composable(TeacherScreens.HotspotActive.route) {
             val currentUiState by viewModel.uiState.collectAsState()
             val connectedStudents by viewModel.connectedStudents.collectAsState()
 
-            (currentUiState as? TeacherUiState.HotspotActive)?.let {
-                // Log when connected students list changes
-                LaunchedEffect(connectedStudents.size) {
-                    Log.d("TeacherNavHost", "HotspotActiveScreen - Connected students count: ${connectedStudents.size}")
-                    connectedStudents.forEachIndexed { index, student ->
-                        Log.d("TeacherNavHost", "  Student $index: ${student.name}")
+            when (val state = currentUiState) {
+                is TeacherUiState.HotspotActive -> {
+                    // Log when connected students list changes
+                    LaunchedEffect(connectedStudents.size) {
+                        Log.d(
+                            "TeacherNavHost",
+                            "HotspotActiveScreen - Connected students count: ${connectedStudents.size}"
+                        )
+                        connectedStudents.forEachIndexed { index, student ->
+                            Log.d("TeacherNavHost", "  Student $index: ${student.name}")
+                        }
+                    }
+
+                    HotspotActiveScreen(
+                        ssid = state.ssid,
+                        password = state.password,
+                        qrBitmap = state.qrBitmap,
+                        connectedStudents = connectedStudents,
+                        onEndSession = {
+                            viewModel.stopHotspot()
+                            navController.navigate(TeacherScreens.Home.route) {
+                                popUpTo(TeacherScreens.Home.route) { inclusive = true }
+                            }
+                        },
+                        onDownloadList = {
+                            viewModel.downloadStudentList()
+                        }
+                    )
+                }
+                is TeacherUiState.Loading, TeacherUiState.Idle -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.background),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
                     }
                 }
-
-                HotspotActiveScreen(
-                    ssid = it.ssid,
-                    password = it.password,
-                    qrBitmap = it.qrBitmap,
-                    connectedStudents = connectedStudents,
-                    onEndSession = {
-                        viewModel.stopHotspot()
-                    },
-                    onDownloadList = {
-                        viewModel.downloadStudentList()
+                is TeacherUiState.Error -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.background),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(text = state.message)
                     }
-                )
+                }
             }
         }
     }

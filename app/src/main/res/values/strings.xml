@@ -5,4 +5,11 @@
     <string name="required_permissions">Required Permissions:\n</string>
     <string name="location_access">- Location Access\n</string>
     <string name="wifi_state_access">- WiFi State Access</string>
+    <string name="enable_hotspot_to_start_taking_attendance">Enable hotspot to start taking attendance</string>
+    <string name="mobile_hotspot">Mobile Hotspot</string>
+    <string name="enable_hotspot">Enable Hotspot</string>
+    <string name="what_happens_next">What happens next:</string>
+    <string name="_1_your_phone_becomes_a_hotspot_2_students_connect_to_your_network_3_attendance_is_recorded_automatically">1. Your phone becomes a hotspot\n2. Students connect to your network\n3. Attendance is recorded automatically</string>
+    <string name="welcome_back">Welcome Back!</string>
+    <string name="ready_to_take_attendance">Ready to take attendance?</string>
 </resources>
