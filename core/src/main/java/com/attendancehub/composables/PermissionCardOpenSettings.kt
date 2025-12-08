@@ -1,4 +1,4 @@
-package org.wahid.attendancehub.ui.core
+package com.attendancehub.composables
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,7 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun PermissionCard(
+fun PermissionCardOpenSettings(
     icon: ImageVector,
     title: String,
     description: String,

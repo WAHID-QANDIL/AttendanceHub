@@ -23,7 +23,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import org.wahid.attendancehub.navigation.TeacherNavHost
 import org.wahid.attendancehub.theme.AttendanceHubTheme
-import org.wahid.attendancehub.ui.core.PermissionCard
+import com.attendancehub.composables.PermissionCardOpenSettings
 import org.wahid.attendancehub.ui.utils.openAppSettings
 import org.wahid.attendancehub.ui.viewmodel.TeacherViewModel
 
@@ -164,7 +164,7 @@ class TeacherMainActivity : ComponentActivity() {
                         .padding(24.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    PermissionCard(
+                    PermissionCardOpenSettings(
                         icon = Icons.AutoMirrored.Filled.ExitToApp,
                         title = stringResource(R.string.permissions_required),
                         description = buildString {

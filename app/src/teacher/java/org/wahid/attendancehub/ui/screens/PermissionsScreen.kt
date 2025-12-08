@@ -12,16 +12,19 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.wahid.attendancehub.R
+import com.attendancehub.composables.Logo
+import com.attendancehub.composables.PermissionCard
 
 @Composable
 fun PermissionsScreen(
-    onGrantPermissions: () -> Unit,
-    showAppSettingDialog: ()-> Unit
+    onGrantPermissions: () -> Unit = {},
+    showAppSettingDialog: () -> Unit = {},
 ) {
     // Permission launcher
     val permissionLauncher = rememberLauncherForActivityResult(
@@ -31,7 +34,7 @@ fun PermissionsScreen(
         val allGranted = permissions.values.all { it }
         if (allGranted) {
             onGrantPermissions()
-        }else{
+        } else {
 
             showAppSettingDialog()
         }
@@ -49,7 +52,8 @@ fun PermissionsScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp),
+            .padding(24.dp)
+            .padding(vertical = 40.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween
     ) {
@@ -58,28 +62,18 @@ fun PermissionsScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Spacer(modifier = Modifier.height(40.dp))
 
             // Icon
-            Surface(
+            Logo(
                 modifier = Modifier.size(80.dp),
                 shape = RoundedCornerShape(40.dp),
                 color = MaterialTheme.colorScheme.primary
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(
-                        imageVector = Icons.Default.Shield,
-                        contentDescription = null,
-                        modifier = Modifier.size(40.dp),
-                        tint = Color.White
-                    )
-                }
-            }
+            )
 
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "Attendance Tracker",
+                text = stringResource(R.string.attendance_tracker),
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold
             )
@@ -87,7 +81,7 @@ fun PermissionsScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "We need a few permissions to help you take attendance",
+                text = stringResource(R.string.we_need_a_few_permissions_to_help_you_take_attendance),
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -98,24 +92,24 @@ fun PermissionsScreen(
             // Permission cards
             PermissionCard(
                 icon = Icons.Default.Wifi,
-                title = "WiFi Access",
-                description = "Required to create and manage hotspot"
+                title = stringResource(R.string.wifi_access),
+                description = stringResource(R.string.required_to_create_and_manage_hotspot)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             PermissionCard(
                 icon = Icons.Default.LocationOn,
-                title = "Location",
-                description = "Needed for WiFi scanning and hotspot"
+                title = stringResource(R.string.location),
+                description = stringResource(R.string.needed_for_wifi_scanning_and_hotspot)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             PermissionCard(
                 icon = Icons.Default.PhoneAndroid,
-                title = "Hotspot Control",
-                description = "Enable and disable mobile hotspot"
+                title = stringResource(R.string.hotspot_control),
+                description = stringResource(R.string.enable_and_disable_mobile_hotspot)
             )
         }
 
@@ -134,7 +128,7 @@ fun PermissionsScreen(
                 shape = RoundedCornerShape(28.dp)
             ) {
                 Text(
-                    text = "Grant Permissions",
+                    text = stringResource(R.string.grant_permissions),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -143,7 +137,7 @@ fun PermissionsScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "These permissions are required for the app to function properly",
+                text = stringResource(R.string.these_permissions_are_required_for_the_app_to_function_properly),
                 style = MaterialTheme.typography.bodySmall,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -153,56 +147,8 @@ fun PermissionsScreen(
     }
 }
 
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun PermissionCard(
-    icon: ImageVector,
-    title: String,
-    description: String
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-        )
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Surface(
-                modifier = Modifier.size(48.dp),
-                shape = RoundedCornerShape(24.dp),
-                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(
-                        imageVector = icon,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(24.dp)
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.width(16.dp))
-
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = description,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        }
-    }
+private fun PermissionScreenPreview() {
+    PermissionsScreen()
 }
-
