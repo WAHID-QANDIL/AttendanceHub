@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.attendancehub.models.ConnectedStudent
 import com.attendancehub.network.HotspotInfo
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
@@ -23,12 +24,12 @@ import org.wahid.attendancehub.data.SessionStudent
 import org.wahid.attendancehub.data.AttendanceSession
 import org.wahid.attendancehub.network.AttendanceServer
 import org.wahid.attendancehub.network.TeacherHotspotManager
-import org.wahid.attendancehub.ui.screens.ConnectedStudent
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.UUID
+import androidx.core.graphics.createBitmap
 
 sealed class TeacherUiState {
     object Idle : TeacherUiState()
@@ -37,7 +38,7 @@ sealed class TeacherUiState {
         val ssid: String,
         val password: String,
         val qrBitmap: Bitmap?,
-        val connectedStudents: List<ConnectedStudent>
+        val connectedStudents: List<ConnectedStudent>,
     ) : TeacherUiState()
     data class Error(val message: String) : TeacherUiState()
 }
@@ -219,7 +220,7 @@ class TeacherViewModel(application: Application) : AndroidViewModel(application)
                 }
             }
 
-            Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888).apply {
+            createBitmap(width, height).apply {
                 setPixels(pixels, 0, width, 0, 0, width, height)
             }
         } catch (e: Exception) {

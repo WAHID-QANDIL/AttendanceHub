@@ -12,4 +12,14 @@
     <string name="_1_your_phone_becomes_a_hotspot_2_students_connect_to_your_network_3_attendance_is_recorded_automatically">1. Your phone becomes a hotspot\n2. Students connect to your network\n3. Attendance is recorded automatically</string>
     <string name="welcome_back">Welcome Back!</string>
     <string name="ready_to_take_attendance">Ready to take attendance?</string>
+    <string name="wifi_access">WiFi Access</string>
+    <string name="required_to_create_and_manage_hotspot">Required to create and manage hotspot</string>
+    <string name="location">Location</string>
+    <string name="needed_for_wifi_scanning_and_hotspot">Needed for WiFi scanning and hotspot</string>
+    <string name="hotspot_control">Hotspot Control</string>
+    <string name="enable_and_disable_mobile_hotspot">Enable and disable mobile hotspot</string>
+    <string name="attendance_tracker">Attendance Tracker</string>
+    <string name="we_need_a_few_permissions_to_help_you_take_attendance">We need a few permissions to help you take attendance</string>
+    <string name="these_permissions_are_required_for_the_app_to_function_properly">These permissions are required for the app to function properly</string>
+    <string name="grant_permissions">Grant Permissions</string>
 </resources>

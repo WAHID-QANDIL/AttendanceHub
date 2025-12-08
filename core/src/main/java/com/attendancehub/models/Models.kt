@@ -64,4 +64,10 @@ data class SessionInfo(
     val totalStudents: Int,
     val isActive: Boolean
 )
-
+data class ConnectedStudent(
+    val name: String,
+    val deviceModel: String,
+    val connectedAt: String,
+    val initials: String,
+    val isPresent: Boolean = true
+)

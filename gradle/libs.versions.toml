@@ -3,6 +3,9 @@ activityKtx = "1.12.0"
 agp = "8.13.1"
 barcodeScanning = "17.3.0"
 cameraCore = "1.5.1"
+koinAndroid = "4.1.1"
+koinAndroidxCompose = "4.1.1"
+koinAndroidxNavigation = "4.1.1"
 kotlin = "2.0.21"
 coreKtx = "1.10.1"
 junit = "4.13.2"
@@ -16,6 +19,10 @@ lifecycleViewmodelCompose = "2.10.0"
 playServicesCodeScanner = "16.1.0"
 appcompat = "1.6.1"
 material = "1.10.0"
+runtime = "1.10.0"
+materialIconsExtended = "1.7.8"
+navigationCompose = "2.9.6"
+zxingAndroidEmbedded = "4.3.0"
 #viewmodelVersion = "1.1.1"
 
 
@@ -42,10 +49,17 @@ androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "u
 androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
+androidx-compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "materialIconsExtended" }
+androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
+koin-android = { module = "io.insert-koin:koin-android", version.ref = "koinAndroid" }
+koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koinAndroidxCompose" }
+koin-androidx-navigation = { module = "io.insert-koin:koin-androidx-navigation", version.ref = "koinAndroidxNavigation" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 play-services-code-scanner = { module = "com.google.android.gms:play-services-code-scanner", version.ref = "playServicesCodeScanner" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "runtime" }
+zxing-android-embedded = { module = "com.journeyapps:zxing-android-embedded", version.ref = "zxingAndroidEmbedded" }
 #viewmodel = { module = "android.arch.lifecycle:viewmodel", version.ref = "viewmodelVersion" }
 
 
