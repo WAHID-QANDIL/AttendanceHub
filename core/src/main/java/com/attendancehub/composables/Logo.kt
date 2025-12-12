@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun Logo(
     modifier: Modifier = Modifier,
+    iconModifier : Modifier = Modifier,
     shape: RoundedCornerShape = RoundedCornerShape(40.dp),
     color: Color = MaterialTheme.colorScheme.primary,
     iconTint: Color = Color.White,
@@ -33,7 +34,7 @@ fun Logo(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                modifier = Modifier.size(40.dp),
+                modifier = iconModifier,
                 tint = iconTint
             )
         }
