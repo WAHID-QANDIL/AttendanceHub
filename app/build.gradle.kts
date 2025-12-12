@@ -72,6 +72,7 @@ android {
 dependencies {
     // Core module provides all shared dependencies via 'api'
     implementation(project(":core"))
+    implementation(project(":student"))
     implementation(libs.zxing.android.embedded)
     implementation(libs.kotlinx.serialization.json)
 
