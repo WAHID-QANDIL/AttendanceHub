@@ -1,3 +1,5 @@
+package com.attendancehub.base
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.Flow
