@@ -70,9 +70,7 @@ fun AttendanceSuccessScreen(
         }
 
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(24.dp),
+            modifier = Modifier.fillMaxSize().padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Logo(
@@ -102,19 +100,14 @@ fun AttendanceSuccessScreen(
                 value = networkName,
                 modifier = Modifier.padding(bottom = 12.dp)
             )
-            InfoCard(
-                icon = Icons.Default.Schedule,
-                label = stringResource(R.string.label_connected_for),
-                value = connectedDuration,
-                modifier = Modifier.padding(bottom = 12.dp)
-            )
+
             InfoCard(
                 icon = Icons.Default.Add,
                 label = stringResource(R.string.label_marked_at),
                 value = markedAtTime,
-                modifier = Modifier.padding(bottom = 14.dp)
+                modifier = Modifier.padding(bottom = 80.dp)
             )
-            CustomButton(
+            CustomButton( //change to home button (color+icon) home ->network scan
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
@@ -131,24 +124,6 @@ fun AttendanceSuccessScreen(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(top=12.dp, bottom = 5.dp)
             )
-
-            Box(
-                modifier = Modifier.align(Alignment.End)
-            ){
-                FloatingActionButton(
-                    onClick = onScanQR,
-                    modifier = Modifier
-                        .size(60.dp),
-                    containerColor = Color(0xFF9C27B0),
-                    contentColor = Color.White
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.QrCodeScanner,
-                        contentDescription = stringResource(R.string.scan_qr_code),
-                        modifier = Modifier.size(32.dp)
-                    )
-                }
-            }
         }
     }
 }
@@ -157,7 +132,7 @@ fun AttendanceSuccessScreen(
 @Composable
 fun AttendanceSuccessScreenPreview(){
     AttendanceSuccessScreen(
-        networkName = "Example Network",
+        networkName = "SSID",
         connectedDuration = "10:30",
         markedAtTime = "12:00 PM",
         onDisconnect = {},
