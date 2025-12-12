@@ -75,7 +75,8 @@ fun PermissionsScreen(
                 color = MaterialTheme.colorScheme.primary,
                 iconTint = Color.White,
                 icon = Icons.Default.Shield,
-                modifier = Modifier.size(80.dp)
+                modifier = Modifier.size(80.dp),
+                iconModifier = Modifier.size(40.dp)
             )
             Spacer(modifier = Modifier.height(24.dp))
             Text(

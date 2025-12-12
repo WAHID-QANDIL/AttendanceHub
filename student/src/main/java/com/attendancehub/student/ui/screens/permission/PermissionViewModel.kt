@@ -1,6 +1,6 @@
 package com.attendancehub.student.ui.screens.permission
 
-import BaseViewModel
+import com.attendancehub.base.BaseViewModel
 
 class PermissionViewModel : BaseViewModel<PermissionState, PermissionEffect>(
     initialState = PermissionState()
