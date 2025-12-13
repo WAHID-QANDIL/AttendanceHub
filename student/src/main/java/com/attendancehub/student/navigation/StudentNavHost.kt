@@ -24,12 +24,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.attendancehub.student.ui.screens.AttendanceSuccessScreen
+import com.attendancehub.student.ui.screens.attendanceSuccess.AttendanceSuccessScreen
 import com.attendancehub.student.ui.screens.ConnectingScreen
 import com.attendancehub.student.ui.screens.ConnectionStep
 import com.attendancehub.student.ui.screens.ManualEntryDialog
 import com.attendancehub.student.ui.screens.permission.PermissionsScreen
-import com.attendancehub.student.ui.screens.QRScannerScreen
+import com.attendancehub.student.ui.screens.qr_scanner.QRScannerScreen
 import com.attendancehub.student.ui.screens.StudentNetworkScanScreen
 import com.attendancehub.student.viewmodel.StudentUiState
 import com.attendancehub.student.viewmodel.StudentViewModel

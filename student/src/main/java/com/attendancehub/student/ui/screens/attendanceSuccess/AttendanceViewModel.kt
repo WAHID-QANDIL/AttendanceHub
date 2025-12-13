@@ -10,8 +10,4 @@ class AttendanceViewModel :BaseViewModel<AttendanceState, AttendanceEffect>(
         updateState { copy(isDisconnecting = true) }
         sendEffect(AttendanceEffect.NavigateBack)
     }
-
-    override fun onScanButtonCLick() {
-        TODO("Not yet implemented")
-    }
 }

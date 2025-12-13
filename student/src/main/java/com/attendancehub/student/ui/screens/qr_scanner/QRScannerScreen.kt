@@ -63,7 +63,9 @@ fun QRScannerScreen(
         )
 
         Column(
-            modifier = Modifier.fillMaxSize().padding(16.dp)
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
         ) {
             Row(
                 modifier = Modifier
@@ -121,13 +123,13 @@ fun QRScannerScreen(
 
                     ) {
                     Text(
-                        text = stringResource(R.string.qr_title),
+                        text = stringResource(R.string.scan_qr_code),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center
                     )
                     Text(
-                        text = stringResource(R.string.qr_instruction),
+                        text = stringResource(R.string.align_the_qr_code_within_the_frame_to_scan_your_attendance),
                         style = MaterialTheme.typography.bodyMedium,
                         textAlign = TextAlign.Center,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
