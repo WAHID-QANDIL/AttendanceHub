@@ -79,7 +79,7 @@ android {
             res.srcDirs("src/teacher/res")
         }
         getByName("student") {
-            java.srcDirs("src/student/java")
+            java.srcDirs("src/student/java", "src/student/kotlin")
             res.srcDirs("src/student/res")
         }
     }
