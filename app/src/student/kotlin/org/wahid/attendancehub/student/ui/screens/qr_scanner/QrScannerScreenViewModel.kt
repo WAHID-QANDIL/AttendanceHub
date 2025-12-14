@@ -28,13 +28,15 @@ import org.wahid.attendancehub.network.StudentHotspotConnectionManager
 import org.wahid.attendancehub.student.ui.screens.ConnectionStep
 import java.util.UUID
 
-class QrScannerScreenViewModel(application: Application):
-    BaseViewModel<QrScannerScreenUiState, QrScannerEffect>(initialState = QrScannerScreenUiState.Idle), QrScannerScreenInteractionListener {
+class QrScannerScreenViewModel(application: Application) :
+    BaseViewModel<QrScannerScreenUiState, QrScannerEffect>(initialState = QrScannerScreenUiState.Idle),
+    QrScannerScreenInteractionListener {
     private val TAG = "QrScannerScreenViewModel"
 
     private val hotspotManager = StudentHotspotConnectionManager.getInstance(application)
     private val attendanceClient = AttendanceClient(context = application)
-//    private val wifiScanner = org.wahid.attendancehub.network.WiFiScanner(application)
+
+    //    private val wifiScanner = org.wahid.attendancehub.network.WiFiScanner(application)
     private var connectionStartTime: Long = 0
     private val prefs = SharedPrefs.getInstance(context = application)
 
@@ -45,7 +47,6 @@ class QrScannerScreenViewModel(application: Application):
     )
 
 
-
     @OptIn(InternalSerializationApi::class)
     override fun onQrCodeScanned(qrCode: QRData) {
         handleQRCode(qrData = qrCode)
@@ -53,10 +54,13 @@ class QrScannerScreenViewModel(application: Application):
 
 
     @OptIn(InternalSerializationApi::class)
-    private fun handleQRCode(qrData:QRData) {
+    private fun handleQRCode(qrData: QRData) {
         viewModelScope.launch {
             Log.d(TAG, "=== QR Code Handler Started ===")
-            Log.d(TAG, "QR Code scanned - SSID: ${qrData.ssid}, IP: ${qrData.serverIp}, Port: ${qrData.port}")
+            Log.d(
+                TAG,
+                "QR Code scanned - SSID: ${qrData.ssid}, IP: ${qrData.serverIp}, Port: ${qrData.port}"
+            )
             Log.d(TAG, "Session ID: ${qrData.sessionId}")
             Log.d(TAG, "Expiry: ${qrData.expiryTimestamp}")
 
@@ -72,13 +76,19 @@ class QrScannerScreenViewModel(application: Application):
             // Check if session is expired
             qrData.expiryTimestamp?.let { expiry ->
                 if (System.currentTimeMillis() > expiry) {
-                    Log.e(TAG, "QR session expired - current: ${System.currentTimeMillis()}, expiry: $expiry")
+                    Log.e(
+                        TAG,
+                        "QR session expired - current: ${System.currentTimeMillis()}, expiry: $expiry"
+                    )
                     updateState {
                         QrScannerScreenUiState.Error("Session has expired. Ask teacher to generate a new QR code.")
                     }
                     return@launch
                 } else {
-                    Log.d(TAG, "Session is valid - ${(expiry - System.currentTimeMillis()) / 1000 / 60} minutes remaining")
+                    Log.d(
+                        TAG,
+                        "Session is valid - ${(expiry - System.currentTimeMillis()) / 1000 / 60} minutes remaining"
+                    )
                 }
             }
 
@@ -118,7 +128,7 @@ class QrScannerScreenViewModel(application: Application):
                         )
                     }
                 }
-            ){
+            ) {
                 connectToNetwork(network, qrData)
             }
 
@@ -133,7 +143,7 @@ class QrScannerScreenViewModel(application: Application):
                 updateState {
                     QrScannerScreenUiState.Connecting(
                         networkName = network.ssid,
-                         currentStep = ConnectionStep.NETWORK_FOUND
+                        currentStep = ConnectionStep.NETWORK_FOUND
                     )
                 }
 
@@ -146,7 +156,7 @@ class QrScannerScreenViewModel(application: Application):
                 updateState {
                     QrScannerScreenUiState.Connecting(
                         networkName = network.ssid,
-                         currentStep = ConnectionStep.AUTHENTICATING
+                        currentStep = ConnectionStep.AUTHENTICATING
                     )
                 }
 
@@ -199,7 +209,7 @@ class QrScannerScreenViewModel(application: Application):
                 updateState {
                     QrScannerScreenUiState.Connecting(
                         networkName = network.ssid,
-                         currentStep = ConnectionStep.REGISTERING
+                        currentStep = ConnectionStep.REGISTERING
                     )
                 }
 
@@ -243,7 +253,8 @@ class QrScannerScreenViewModel(application: Application):
                 }
 
                 if (sendResult?.isFailure == true) {
-                    val errorMsg = sendResult.exceptionOrNull()?.message ?: "Failed to mark attendance"
+                    val errorMsg =
+                        sendResult.exceptionOrNull()?.message ?: "Failed to mark attendance"
                     Log.e(TAG, "Attendance submission failed after $attempts attempts: $errorMsg")
                     updateState {
                         QrScannerScreenUiState.Error(
@@ -299,7 +310,10 @@ class QrScannerScreenViewModel(application: Application):
         cameraExecutor: java.util.concurrent.Executor,
         onQRCodeScanned: (QRData) -> Unit,
 
-    ){
+        ) {
+
+
+//        TODO("Need to update the state")
         Log.d("QRScanner", "Camera provider listener triggered")
         val cameraProvider = cameraProviderFuture.get()
         Log.d("QRScanner", "Camera provider obtained successfully")
@@ -333,7 +347,15 @@ class QrScannerScreenViewModel(application: Application):
                             .addOnSuccessListener { barcodes ->
                                 for (barcode in barcodes) {
                                     barcode.rawValue?.let { qrContent ->
-                                        try {
+                                        execute(
+                                            onError = {
+                                                Log.e(
+                                                    "QRScanner",
+                                                    "Error handling scanned QR code: ${it.message}"
+                                                )
+                                                onError("Invalid QR code: ${it.message}")
+                                            }
+                                        ) {
                                             Log.d(
                                                 "QRScanner",
                                                 "QR Code detected (type=${barcode.valueType}): $qrContent"
@@ -346,48 +368,28 @@ class QrScannerScreenViewModel(application: Application):
                                                 "QRScanner",
                                                 "QR parsed - SSID: ${qrData.ssid}, Password: ${qrData.password}"
                                             )
-
-                                            // Validate QR data
-                                            if (qrData.ssid.isNotEmpty() && qrData.password.isNotEmpty()) {
-                                                Log.d(
-                                                    "QRScanner",
-                                                    "QR validated successfully, calling onQRCodeScanned"
-                                                )
-
-//                                        isScanning(false) // stop scanning
-//                                        onSuccess("QR Code detected! Connecting...")
-
-
-                                                onQRCodeScanned(qrData)
-
-                                            } else {
-                                                Log.w(
-                                                    "QRScanner",
-                                                    "QR data validation failed - SSID or password empty"
-                                                )
-//                                        onError("Invalid QR data - missing network info")
-                                            }
-
-                                        } catch (e: Exception) {
-                                            Log.e(
-                                                "QRScanner",
-                                                "Failed to parse QR code: ${e.message}",
-                                                e
-                                            )
-
                                             if (qrContent.trim().startsWith("{")) {
-                                                onError("Invalid QR code format: ${e.message}")
+                                                throw Exception("Invalid QR code format")
                                             } else {
                                                 Log.d(
                                                     "QRScanner",
                                                     "Ignoring non-JSON QR code"
                                                 )
                                             }
+                                            if (qrData.ssid.isNotEmpty() && qrData.password.isNotEmpty()) {
+                                                Log.d(
+                                                    "QRScanner",
+                                                    "QR validated successfully, calling onQRCodeScanned"
+                                                )
+                                                onQRCodeScanned(qrData)
+                                            } else {
+                                                throw Exception("SSID or password empty")
+                                            }
                                         }
+
                                     }
                                 }
-                            }
-                            .addOnFailureListener {
+                            }.addOnFailureListener {
                                 Log.e("QRScanner", "Failed to scan", it)
                                 onError("Scan failed: ${it.message}")
                             }
@@ -415,7 +417,7 @@ class QrScannerScreenViewModel(application: Application):
                 imageAnalyzer
             )
 
-            onFlashDetected(camera.cameraInfo.hasFlashUnit())
+//            onFlashDetected(camera.cameraInfo.hasFlashUnit())
             Log.d(
                 "QRScanner",
                 "Camera bound successfully, hasFlash=${camera.cameraInfo.hasFlashUnit()}"
@@ -428,7 +430,6 @@ class QrScannerScreenViewModel(application: Application):
 
 
     }
-
 
 
     private fun getDeviceId(): String {
@@ -451,9 +452,5 @@ class QrScannerScreenViewModel(application: Application):
         }
     }
 
-    private fun onFlashDetected(hasFlash: Boolean) {
-        Log.d(TAG, "Flash unit detected: $hasFlash")
-        // Could update state to show flash toggle button if needed
-    }
 
 }

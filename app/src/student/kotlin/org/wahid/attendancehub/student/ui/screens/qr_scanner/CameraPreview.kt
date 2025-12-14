@@ -28,7 +28,6 @@ fun CameraPreview(
             val cameraProviderFuture = ProcessCameraProvider.getInstance(ctx)
 
             cameraProviderFuture.addListener({
-                try {
                     viewModel.cameraPreviewListenerStub(
                         cameraProviderFuture,
                         previewView,
@@ -38,10 +37,6 @@ fun CameraPreview(
                             viewModel.onQrCodeScanned(qrData)
                         }
                     )
-                } catch (e: Exception) {
-                    Log.e("QRScanner", "Camera provider failed", e)
-                    // Error will be handled inside the ViewModel
-                }
             }, ContextCompat.getMainExecutor(ctx))
 
             Log.d("QRScanner", "Returning preview view from factory")
