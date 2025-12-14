@@ -1,4 +1,4 @@
-package com.attendancehub.composables
+package org.wahid.attendancehub.composables
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -27,7 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.attendancehub.models.ConnectedStudent
+import org.wahid.attendancehub.models.ConnectedStudent
 
 @Composable
 fun StudentListItem(student: ConnectedStudent) {

@@ -10,9 +10,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
-import com.attendancehub.student.navigation.StudentNavHost
-import com.attendancehub.student.ui.theme.AttendanceHubTheme
-import com.attendancehub.student.viewmodel.StudentViewModel
+import org.wahid.attendancehub.student.navigation.StudentNavHost
+import org.wahid.attendancehub.student.ui.theme.AttendanceHubTheme
+import org.wahid.attendancehub.student.viewmodel.StudentViewModel
 
 class StudentMainActivity : ComponentActivity() {
     private val viewModel by viewModels<StudentViewModel>()
