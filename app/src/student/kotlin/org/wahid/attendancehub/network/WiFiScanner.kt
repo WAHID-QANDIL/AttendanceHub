@@ -11,8 +11,8 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresPermission
 import androidx.core.content.ContextCompat
-import org.wahid.attendancehub.student.ui.screens.WifiNetwork
 import kotlinx.coroutines.suspendCancellableCoroutine
+import org.wahid.attendancehub.models.WifiNetwork
 import kotlin.coroutines.resume
 
 /**

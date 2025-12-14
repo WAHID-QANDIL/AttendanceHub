@@ -24,7 +24,21 @@ import kotlinx.coroutines.withTimeoutOrNull
  * 5. All subsequent HTTP calls use the hotspot network
  * 6. Call disconnect() when done to release resources
  */
-class StudentHotspotConnectionManager(private val ctx: Context) : HotspotManager {
+class StudentHotspotConnectionManager private constructor(private val ctx: Context) :
+    HotspotManager {
+
+    companion object {
+        @Volatile
+        private var INSTANCE: StudentHotspotConnectionManager? = null
+        fun getInstance(context: Context): StudentHotspotConnectionManager {
+            return INSTANCE ?: synchronized(this) {
+                val instance = StudentHotspotConnectionManager(context.applicationContext)
+                INSTANCE = instance
+                instance
+            }
+        }
+
+    }
 
     private val TAG = "StudentHotspotManager"
     private var networkCallback: ConnectivityManager.NetworkCallback? = null
@@ -49,93 +63,94 @@ class StudentHotspotConnectionManager(private val ctx: Context) : HotspotManager
      * IMPORTANT: This shows a system dialog that the user must approve.
      * The connection is app-scoped (other apps keep using default network).
      */
-    override suspend fun connect(ssid: String, password: String): Result<Unit> = withContext(Dispatchers.Main) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            val cm = ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    override suspend fun connect(ssid: String, password: String): Result<Unit> =
+        withContext(Dispatchers.Main) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                val cm = ctx.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
-            // Build WiFi network specifier
-            val specifier = WifiNetworkSpecifier.Builder()
-                .setSsid(ssid)
-                .setWpa2Passphrase(password)
-                .build()
+                // Build WiFi network specifier
+                val specifier = WifiNetworkSpecifier.Builder()
+                    .setSsid(ssid)
+                    .setWpa2Passphrase(password)
+                    .build()
 
-            // Build network request with WiFi transport
-            val request = NetworkRequest.Builder()
-                .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
-                .removeCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) // Local-only network
-                .setNetworkSpecifier(specifier)
-                .build()
+                // Build network request with WiFi transport
+                val request = NetworkRequest.Builder()
+                    .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+                    .removeCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) // Local-only network
+                    .setNetworkSpecifier(specifier)
+                    .build()
 
-            val deferred = CompletableDeferred<Result<Unit>>()
+                val deferred = CompletableDeferred<Result<Unit>>()
 
-            // Create network callback
-            val callback = object : ConnectivityManager.NetworkCallback() {
-                override fun onAvailable(network: Network) {
-                    Log.d(TAG, "Network available: $network")
+                // Create network callback
+                val callback = object : ConnectivityManager.NetworkCallback() {
+                    override fun onAvailable(network: Network) {
+                        Log.d(TAG, "Network available: $network")
 
-                    // Log network capabilities
-                    val caps = cm.getNetworkCapabilities(network)
-                    Log.d(TAG, "Network capabilities: $caps")
+                        // Log network capabilities
+                        val caps = cm.getNetworkCapabilities(network)
+                        Log.d(TAG, "Network capabilities: $caps")
 
-                    // CRITICAL: Bind process to this network
-                    // This ensures all HTTP/socket calls use the hotspot network
-                    val bound = cm.bindProcessToNetwork(network)
-                    if (bound) {
-                        boundNetwork = network
-                        Log.d(TAG, "Process bound to network successfully")
-                        Log.d(TAG, "Bound network: ${cm.getBoundNetworkForProcess()}")
-                        deferred.complete(Result.success(Unit))
-                    } else {
-                        Log.e(TAG, "Failed to bind process to network")
-                        deferred.complete(Result.failure(RuntimeException("Failed to bind to network")))
+                        // CRITICAL: Bind process to this network
+                        // This ensures all HTTP/socket calls use the hotspot network
+                        val bound = cm.bindProcessToNetwork(network)
+                        if (bound) {
+                            boundNetwork = network
+                            Log.d(TAG, "Process bound to network successfully")
+                            Log.d(TAG, "Bound network: ${cm.getBoundNetworkForProcess()}")
+                            deferred.complete(Result.success(Unit))
+                        } else {
+                            Log.e(TAG, "Failed to bind process to network")
+                            deferred.complete(Result.failure(RuntimeException("Failed to bind to network")))
+                        }
+                    }
+
+                    override fun onUnavailable() {
+                        Log.e(TAG, "Network unavailable (user may have declined)")
+                        deferred.complete(Result.failure(RuntimeException("Network unavailable - connection rejected or failed")))
+                    }
+
+                    override fun onLost(network: Network) {
+                        Log.w(TAG, "Network lost: $network")
+                        boundNetwork = null
+                        // Don't complete deferred here - this happens after disconnect
+                    }
+
+                    override fun onCapabilitiesChanged(
+                        network: Network,
+                        networkCapabilities: NetworkCapabilities,
+                    ) {
+                        Log.d(TAG, "Network capabilities changed: $networkCapabilities")
                     }
                 }
 
-                override fun onUnavailable() {
-                    Log.e(TAG, "Network unavailable (user may have declined)")
-                    deferred.complete(Result.failure(RuntimeException("Network unavailable - connection rejected or failed")))
+                networkCallback = callback
+
+                // Request network connection
+                // This triggers system UI asking user to connect
+                cm.requestNetwork(request, callback)
+
+                // Wait for connection with timeout
+                val result = withTimeoutOrNull(30000L) { // 30 second timeout
+                    deferred.await()
                 }
 
-                override fun onLost(network: Network) {
-                    Log.w(TAG, "Network lost: $network")
-                    boundNetwork = null
-                    // Don't complete deferred here - this happens after disconnect
+                return@withContext result ?: run {
+                    // Timeout - clean up
+                    cm.unregisterNetworkCallback(callback)
+                    networkCallback = null
+                    Result.failure(RuntimeException("Connection timeout - user may not have approved"))
                 }
 
-                override fun onCapabilitiesChanged(
-                    network: Network,
-                    networkCapabilities: NetworkCapabilities
-                ) {
-                    Log.d(TAG, "Network capabilities changed: $networkCapabilities")
-                }
+            } else {
+                // Pre-Android Q: Would need legacy WiFi APIs
+                // WifiManager.addNetwork() + WifiManager.enableNetwork()
+                // Requires CHANGE_WIFI_STATE and is deprecated
+                Log.e(TAG, "Android Q+ required for WifiNetworkSpecifier")
+                Result.failure(RuntimeException("Android 10+ required for secure WiFi connection"))
             }
-
-            networkCallback = callback
-
-            // Request network connection
-            // This triggers system UI asking user to connect
-            cm.requestNetwork(request, callback)
-
-            // Wait for connection with timeout
-            val result = withTimeoutOrNull(30000L) { // 30 second timeout
-                deferred.await()
-            }
-
-            return@withContext result ?: run {
-                // Timeout - clean up
-                cm.unregisterNetworkCallback(callback)
-                networkCallback = null
-                Result.failure(RuntimeException("Connection timeout - user may not have approved"))
-            }
-
-        } else {
-            // Pre-Android Q: Would need legacy WiFi APIs
-            // WifiManager.addNetwork() + WifiManager.enableNetwork()
-            // Requires CHANGE_WIFI_STATE and is deprecated
-            Log.e(TAG, "Android Q+ required for WifiNetworkSpecifier")
-            Result.failure(RuntimeException("Android 10+ required for secure WiFi connection"))
         }
-    }
 
     /**
      * Disconnect from hotspot and release network resources

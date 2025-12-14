@@ -30,7 +30,7 @@ import org.wahid.attendancehub.student.ui.screens.ConnectionStep
 import org.wahid.attendancehub.student.ui.screens.ManualEntryDialog
 import org.wahid.attendancehub.student.ui.screens.permission.PermissionsScreen
 import org.wahid.attendancehub.student.ui.screens.qr_scanner.QRScannerScreen
-import org.wahid.attendancehub.student.ui.screens.StudentNetworkScanScreen
+import org.wahid.attendancehub.student.ui.screens.home.StudentNetworkScanScreen
 import org.wahid.attendancehub.student.viewmodel.StudentUiState
 import org.wahid.attendancehub.student.viewmodel.StudentViewModel
 import kotlinx.serialization.InternalSerializationApi
@@ -103,6 +103,9 @@ fun StudentNavHost(
                 org.wahid.attendancehub.student.ui.screens.StudentInfoScreen(
                     onInfoSaved = { first, last, id ->
                         viewModel.saveStudentInfo(first, last, id)
+                        navController.navigate(StudentScreen.NetworkScan.route){
+                            popUpTo(StudentScreen.StudentInfo.route) { inclusive = true}
+                        }
                     },
                     existingFirstName = firstName,
                     existingLastName = lastName,
@@ -112,13 +115,7 @@ fun StudentNavHost(
 
             // Permissions Screen
             composable(StudentScreen.Permissions.route) {
-                PermissionsScreen(
-//                onGrantPermissions = {
-//                    navController.navigate(StudentScreen.NetworkScan.route) {
-//                        popUpTo(StudentScreen.Permissions.route) { inclusive = true }
-//                    }
-//                }
-                )
+                PermissionsScreen()
             }
 
             // Network Scan Screen
@@ -178,13 +175,11 @@ fun StudentNavHost(
         // QR Scanner Screen
         composable(StudentScreen.QRScanner.route) {
             QRScannerScreen(
-                onQRCodeScanned = { qrData ->
-                    viewModel.handleQRCode(qrData)
-                },
                 onClose = {
                     viewModel.cancelQRScanning()
                     navController.popBackStack()
-                }
+                },
+                navController = navController
             )
         }
 
@@ -209,17 +204,8 @@ fun StudentNavHost(
             state?.let {
                 AttendanceSuccessScreen(
                     networkName = it.networkName,
-                    connectedDuration = it.connectedDuration,
                     markedAtTime = it.markedAtTime,
-                    onDisconnect = {
-                        viewModel.disconnect()
-                        navController.navigate(StudentScreen.NetworkScan.route) {
-                            popUpTo(StudentScreen.NetworkScan.route) { inclusive = true }
-                        }
-                    },
-                    onScanQR = {
-                        viewModel.startQRScanning()
-                    }
+                    navController = navController
                 )
             }
         }

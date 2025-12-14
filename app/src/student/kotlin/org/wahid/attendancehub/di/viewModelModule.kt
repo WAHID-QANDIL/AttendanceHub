@@ -1,9 +1,13 @@
 package org.wahid.attendancehub.di
 
 import org.wahid.attendancehub.student.ui.screens.permission.PermissionViewModel
-import org.koin.androidx.viewmodel.dsl.viewModel
-import org.koin.dsl.module
+import org.koin.dsl.*
+import org.koin.core.module.dsl.viewModelOf
+import org.wahid.attendancehub.student.ui.screens.attendanceSuccess.AttendanceViewModel
+import org.wahid.attendancehub.student.ui.screens.qr_scanner.QrScannerScreenViewModel
 
 val viewModelModule = module {
-    viewModel { PermissionViewModel() }
+    viewModelOf(constructor = ::PermissionViewModel )
+    viewModelOf(constructor = ::AttendanceViewModel )
+    viewModelOf(constructor = ::QrScannerScreenViewModel )
 }

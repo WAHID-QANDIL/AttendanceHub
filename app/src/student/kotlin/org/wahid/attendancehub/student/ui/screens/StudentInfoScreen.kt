@@ -25,7 +25,7 @@ fun StudentInfoScreen(
     onInfoSaved: (firstName: String, lastName: String, studentId: String) -> Unit,
     existingFirstName: String = "",
     existingLastName: String = "",
-    existingStudentId: String = ""
+    existingStudentId: String = "",
 ) {
     var firstName by remember { mutableStateOf(existingFirstName) }
     var lastName by remember { mutableStateOf(existingLastName) }
@@ -34,8 +34,8 @@ fun StudentInfoScreen(
     val focusManager = LocalFocusManager.current
 
     val isFormValid = firstName.isNotBlank() &&
-                      lastName.isNotBlank() &&
-                      studentId.isNotBlank()
+            lastName.isNotBlank() &&
+            studentId.isNotBlank()
 
     Scaffold(
         topBar = {
