@@ -5,8 +5,8 @@ import android.graphics.Bitmap
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.attendancehub.models.ConnectedStudent
-import com.attendancehub.network.HotspotInfo
+import org.wahid.attendancehub.models.ConnectedStudent
+import org.wahid.attendancehub.network.HotspotInfo
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
 import com.google.zxing.qrcode.QRCodeWriter
@@ -181,7 +181,7 @@ class TeacherViewModel(application: Application) : AndroidViewModel(application)
     private suspend fun generateQRCode(hotspotInfo: HotspotInfo): Bitmap? = withContext(Dispatchers.Default) {
         try {
             // Create QR data object
-            val qrData = com.attendancehub.models.QRData(
+            val qrData = org.wahid.attendancehub.models.QRData(
                 ssid = hotspotInfo.ssid,
                 password = hotspotInfo.password,
                 serverIp = "192.168.49.1", // Default local-only hotspot IP

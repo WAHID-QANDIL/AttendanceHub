@@ -1,22 +1,28 @@
 package org.wahid.attendancehub.network
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
 import android.net.wifi.WifiManager
-import com.attendancehub.network.HotspotInfo
-import com.attendancehub.network.HotspotManager
+import androidx.core.app.ActivityCompat
+import org.wahid.attendancehub.network.HotspotInfo
+import org.wahid.attendancehub.network.HotspotManager
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
+@Suppress("DEPRECATION")
 class TeacherHotspotManager(private val context: Context): HotspotManager {
     private var res: WifiManager.LocalOnlyHotspotReservation? = null
 
-    override suspend fun start(): Result<HotspotInfo> = withContext(Dispatchers.Main) @androidx.annotation.RequiresPermission(
+    @androidx.annotation.RequiresPermission(
         allOf = [android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.NEARBY_WIFI_DEVICES]
-    ) {
+    )
+    override suspend fun start(): Result<HotspotInfo> = withContext(Dispatchers.Main) {
         val wifiManager =
             context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
         val deferred = CompletableDeferred<Result<HotspotInfo>>()
+
 
 
         wifiManager.startLocalOnlyHotspot(object : WifiManager.LocalOnlyHotspotCallback() {

@@ -23,7 +23,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import org.wahid.attendancehub.navigation.TeacherNavHost
 import org.wahid.attendancehub.theme.AttendanceHubTheme
-import com.attendancehub.composables.PermissionCardOpenSettings
+import org.wahid.attendancehub.composables.PermissionCardOpenSettings
 import org.wahid.attendancehub.ui.utils.openAppSettings
 import org.wahid.attendancehub.ui.viewmodel.TeacherViewModel
 
