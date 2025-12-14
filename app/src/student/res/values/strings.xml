@@ -61,5 +61,9 @@
     <string name="step_network_found">Network found</string>
     <string name="step_authenticating">Authenticating...</string>
     <string name="step_registering">Registering attendance</string>
-    <string name="align_the_qr_code_within_the_frame_to_scan_your_attendance">Align the QR code within the frame to scan your attendance.</string>
+    <string name="align_the_qr_code_within_the_frame_to_scan_your_attendance">Align the QR code within the frame to record your attendance.</string>
+    <string name="attendance_marked">Attendance Marked!</string>
+    <string name="connecting">Connecting...</string>
+    <string name="error">Error</string>
+    <string name="close">Close</string>
 </resources>

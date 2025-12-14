@@ -71,3 +71,16 @@ data class ConnectedStudent(
     val initials: String,
     val isPresent: Boolean = true
 )
+data class WifiNetwork(
+    val ssid: String,
+    val password: String = "",
+    val signalStrength: Int, // 0-4
+    val isSecured: Boolean,
+    val isTeacherNetwork: Boolean = false
+)
+
+data class StudentInfo(
+    val firstName: String,
+    val lastName: String,
+    val studentId: String
+)
