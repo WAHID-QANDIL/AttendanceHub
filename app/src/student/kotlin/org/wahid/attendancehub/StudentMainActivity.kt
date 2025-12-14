@@ -1,4 +1,4 @@
-package org.wahid.attendancehub.student
+package org.wahid.attendancehub
 
 import android.Manifest
 import android.content.pm.PackageManager
