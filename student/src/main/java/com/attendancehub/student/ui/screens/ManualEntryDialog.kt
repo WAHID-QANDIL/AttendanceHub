@@ -18,6 +18,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.attendancehub.student.R
@@ -247,4 +248,9 @@ fun ManualEntryDialog(
 
 private fun validateInput(ssid: String, password: String): Boolean {
     return ssid.trim().isNotEmpty() && password.isNotEmpty()
+}
+@Preview
+@Composable
+fun ManualEntryDialogPreview(){
+    ManualEntryDialog(onDismiss = {}, onConnect = { _, _ -> })
 }
