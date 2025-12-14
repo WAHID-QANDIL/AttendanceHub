@@ -1,4 +1,4 @@
-package com.attendancehub.network
+package org.wahid.attendancehub.network
 
 interface HotspotManager {
     suspend fun start(): Result<HotspotInfo>

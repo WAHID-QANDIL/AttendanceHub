@@ -1,4 +1,4 @@
-package com.attendancehub.models
+package org.wahid.attendancehub.models
 
 import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.Serializable

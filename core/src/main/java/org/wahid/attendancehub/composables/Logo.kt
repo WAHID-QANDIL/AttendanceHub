@@ -1,4 +1,4 @@
-package com.attendancehub.composables
+package org.wahid.attendancehub.composables
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size

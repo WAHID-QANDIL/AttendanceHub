@@ -1,4 +1,4 @@
-package com.attendancehub.utils
+package org.wahid.attendancehub.utils
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect

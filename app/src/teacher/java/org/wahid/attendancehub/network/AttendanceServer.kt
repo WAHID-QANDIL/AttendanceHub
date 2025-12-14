@@ -1,7 +1,7 @@
 package org.wahid.attendancehub.network
 
 import android.util.Log
-import com.attendancehub.models.StudentAttendance
+import org.wahid.attendancehub.models.StudentAttendance
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

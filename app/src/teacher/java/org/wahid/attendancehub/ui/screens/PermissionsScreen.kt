@@ -18,8 +18,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.wahid.attendancehub.R
-import com.attendancehub.composables.Logo
-import com.attendancehub.composables.PermissionCard
+import org.wahid.attendancehub.composables.Logo
+import org.wahid.attendancehub.composables.PermissionCard
 
 @Composable
 fun PermissionsScreen(

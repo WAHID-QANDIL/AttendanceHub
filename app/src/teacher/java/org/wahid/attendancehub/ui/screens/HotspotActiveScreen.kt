@@ -17,8 +17,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.attendancehub.composables.StudentListItem
-import com.attendancehub.models.ConnectedStudent
+import org.wahid.attendancehub.composables.StudentListItem
+import org.wahid.attendancehub.models.ConnectedStudent
 
 @Composable
 fun HotspotActiveScreen(

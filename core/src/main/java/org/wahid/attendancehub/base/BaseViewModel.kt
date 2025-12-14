@@ -1,4 +1,4 @@
-package com.attendancehub.base
+package org.wahid.attendancehub.base
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
