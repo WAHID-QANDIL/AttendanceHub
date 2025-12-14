@@ -34,15 +34,15 @@ fun PermissionsScreen(
 ) {
     val navController = LocalNavController.current
 
-        ObserveAsEffect(viewModel.effect) { effect ->
-            when (effect) {
-                is PermissionEffect.NavigateToStudentInfo -> {
-                    navController.navigate(StudentScreen.NetworkScan.route) {
-                        popUpTo(StudentScreen.Permissions.route) { inclusive = true }
-                    }
+    ObserveAsEffect(viewModel.effect) { effect ->
+        when (effect) {
+            is PermissionEffect.NavigateToStudentInfo -> {
+                navController.navigate(StudentScreen.NetworkScan.route) {
+                    popUpTo(StudentScreen.Permissions.route) { inclusive = true }
                 }
             }
         }
+    }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()

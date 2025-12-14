@@ -1,4 +1,4 @@
-package org.wahid.attendancehub.student.ui.screens
+package org.wahid.attendancehub.student.ui.screens.home
 
 import org.wahid.attendancehub.R
 import androidx.compose.foundation.clickable
@@ -18,14 +18,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.wahid.attendancehub.models.WifiNetwork
 
-
-data class WifiNetwork(
-    val ssid: String,
-    val signalStrength: Int, // 0-4
-    val isSecured: Boolean,
-    val isTeacherNetwork: Boolean = false
-)
 
 @Composable
 fun StudentNetworkScanScreen(
@@ -116,22 +110,22 @@ fun StudentNetworkScanScreen(
 
                         Spacer(modifier = Modifier.height(16.dp))
                         // Other networks
-                        val otherNetworks = availableNetworks.filter { !it.isTeacherNetwork }
-                        LazyColumn(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(200.dp)
-                        ) {
-                            items(otherNetworks) { network ->
-                                NetworkListItem(
-                                    network = network,
-                                    onClick = { onNetworkSelected(network) }
-                                )
-                                if (network != otherNetworks.last()) {
-                                    HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
-                                }
-                            }
-                        }
+//                        val otherNetworks = availableNetworks.filter { !it.isTeacherNetwork }
+//                        LazyColumn(
+//                            modifier = Modifier
+//                                .fillMaxWidth()
+//                                .height(200.dp)
+//                        ) {
+//                            items(otherNetworks) { network ->
+//                                NetworkListItem(
+//                                    network = network,
+//                                    onClick = { onNetworkSelected(network) }
+//                                )
+//                                if (network != otherNetworks.last()) {
+//                                    HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
+//                                }
+//                            }
+//                        }
                     }
                 }
 

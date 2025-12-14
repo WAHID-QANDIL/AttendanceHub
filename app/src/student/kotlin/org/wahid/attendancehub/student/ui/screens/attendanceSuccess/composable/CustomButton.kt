@@ -26,14 +26,17 @@ fun CustomButton(
     fontModifier : Modifier = Modifier,
     iconModifier : Modifier = Modifier,
     textStyle: TextStyle = MaterialTheme.typography.titleMedium,
-    fontWeight: FontWeight = FontWeight.SemiBold
+    fontWeight: FontWeight = FontWeight.SemiBold,
+    containerColor: Color = Color.White,
+    textColor: Color = Color.Black
 ){
     Button(
         onClick = onClick,
         modifier = modifier,
         shape = RoundedCornerShape(28.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color(0xFFEF5350)
+            containerColor = containerColor,
+            contentColor = textColor
         )
     ) {
         Icon(

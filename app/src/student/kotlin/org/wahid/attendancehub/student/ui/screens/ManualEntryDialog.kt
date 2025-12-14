@@ -2,6 +2,7 @@ package org.wahid.attendancehub.student.ui.screens
 
 import org.wahid.attendancehub.R
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -19,6 +20,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 
@@ -43,7 +45,7 @@ fun ManualEntryDialog(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(10.dp),
             shape = RoundedCornerShape(20.dp),
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surface
@@ -193,7 +195,7 @@ fun ManualEntryDialog(
                 // Action Buttons
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     // Cancel Button
                     OutlinedButton(
@@ -205,7 +207,7 @@ fun ManualEntryDialog(
                     ) {
                         Text(stringResource(R.string.cancel_button))
                     }
-
+                    Spacer(modifier = Modifier.width(8.dp))
                     // Connect Button
                     Button(
                         onClick = {
@@ -235,7 +237,7 @@ fun ManualEntryDialog(
                         Icon(
                             imageVector = Icons.Default.WifiFind,
                             contentDescription = null,
-                            modifier = Modifier.size(18.dp)
+                            modifier = Modifier.size(10.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(stringResource(R.string.connect_button))
@@ -248,4 +250,13 @@ fun ManualEntryDialog(
 
 private fun validateInput(ssid: String, password: String): Boolean {
     return ssid.trim().isNotEmpty() && password.isNotEmpty()
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ManualDialogPreview() {
+    ManualEntryDialog(
+        onConnect = { _, _ -> },
+        onDismiss = { }
+    )
 }
