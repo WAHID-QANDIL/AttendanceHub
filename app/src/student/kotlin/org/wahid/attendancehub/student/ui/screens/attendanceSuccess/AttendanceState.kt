@@ -1,7 +1,7 @@
 package org.wahid.attendancehub.student.ui.screens.attendanceSuccess
 
 data class AttendanceState(
-    val isDisconnecting: Boolean = false,
+    val isReturningHome: Boolean = false,
     val networkName : String = "",
     val markedAt : String = ""
 )

@@ -6,8 +6,8 @@ class AttendanceViewModel :BaseViewModel<AttendanceState, AttendanceEffect>(
     initialState = AttendanceState()
 ), AttendanceInteractionListener {
 
-    override fun onDisconnectClick() {
-        updateState { copy(isDisconnecting = true) }
+    override fun onReturnHome() {
+        updateState { copy(isReturningHome = true) }
         sendEffect(AttendanceEffect.NavigateBack)
     }
 }

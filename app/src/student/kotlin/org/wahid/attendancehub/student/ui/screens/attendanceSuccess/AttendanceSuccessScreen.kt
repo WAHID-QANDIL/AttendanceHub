@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import org.koin.androidx.compose.koinViewModel
 import org.wahid.attendancehub.R
 import org.wahid.attendancehub.composables.Logo
 import org.wahid.attendancehub.student.ui.screens.attendanceSuccess.composable.CustomButton
@@ -23,10 +24,8 @@ import org.wahid.attendancehub.student.ui.screens.attendanceSuccess.composable.I
 @Composable
 fun AttendanceSuccessScreen(
     networkName: String,
-    connectedDuration: String,
     markedAtTime: String,
-    onDisconnect: () -> Unit,
-    onScanQR: () -> Unit
+    viewModel: AttendanceViewModel = koinViewModel<AttendanceViewModel>()
 ) {
     Column(
         modifier = Modifier.fillMaxSize()
@@ -70,7 +69,9 @@ fun AttendanceSuccessScreen(
         }
 
         Column(
-            modifier = Modifier.fillMaxSize().padding(24.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Logo(
@@ -107,18 +108,22 @@ fun AttendanceSuccessScreen(
                 value = markedAtTime,
                 modifier = Modifier.padding(bottom = 80.dp)
             )
-            CustomButton( //change to home button (color+icon) home ->network scan
+            CustomButton(
+                //change to home button (color+icon) home ->network scan
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
-                onClick = onDisconnect,
-                icon = Icons.Default.WifiOff,
+                onClick = {
+                    viewModel.onReturnHome()
+                },
+                icon = Icons.Default.Home,
                 iconModifier = Modifier.size(20.dp),
-                fontModifier =  Modifier.padding(start = 8.dp),
-                text = stringResource(R.string.disconnect_button),
+                fontModifier = Modifier.padding(start = 8.dp),
+                text = "Return Home",
+                containerColor = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
-                text = stringResource(R.string.disconnect_warning),
+                text = stringResource(R.string.your_attendance_has_been_successfully_recorded),
                 style = MaterialTheme.typography.bodySmall,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -133,9 +138,7 @@ fun AttendanceSuccessScreen(
 fun AttendanceSuccessScreenPreview(){
     AttendanceSuccessScreen(
         networkName = "SSID",
-        connectedDuration = "10:30",
         markedAtTime = "12:00 PM",
-        onDisconnect = {},
-        onScanQR = {}
+
     )
 }
