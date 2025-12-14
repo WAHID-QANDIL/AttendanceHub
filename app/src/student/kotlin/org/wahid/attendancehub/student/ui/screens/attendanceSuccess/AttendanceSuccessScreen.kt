@@ -15,18 +15,39 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import org.koin.androidx.compose.koinViewModel
 import org.wahid.attendancehub.R
 import org.wahid.attendancehub.composables.Logo
+import org.wahid.attendancehub.student.navigation.StudentScreen
 import org.wahid.attendancehub.student.ui.screens.attendanceSuccess.composable.CustomButton
 import org.wahid.attendancehub.student.ui.screens.attendanceSuccess.composable.InfoCard
+import org.wahid.attendancehub.utils.ObserveAsEffect
 
 @Composable
 fun AttendanceSuccessScreen(
     networkName: String,
     markedAtTime: String,
-    viewModel: AttendanceViewModel = koinViewModel<AttendanceViewModel>()
+    viewModel: AttendanceViewModel = koinViewModel<AttendanceViewModel>(),
+    navController: NavController
 ) {
+
+    ObserveAsEffect(viewModel.effect) {
+        when (it) {
+            is AttendanceEffect.ReturnHome -> {
+                viewModel.disconnect()
+                navController.navigate(StudentScreen.NetworkScan.route){
+                    popUpTo(StudentScreen.Success.route){ inclusive = true }
+                }
+            }
+        }
+
+
+    }
+
+
+
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -139,6 +160,6 @@ fun AttendanceSuccessScreenPreview(){
     AttendanceSuccessScreen(
         networkName = "SSID",
         markedAtTime = "12:00 PM",
-
+        navController = rememberNavController()
     )
 }
