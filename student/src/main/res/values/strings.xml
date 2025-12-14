@@ -61,4 +61,22 @@
     <string name="step_network_found">Network found</string>
     <string name="step_authenticating">Authenticating...</string>
     <string name="step_registering">Registering attendance</string>
+
+    <!-- QRScanner Screen -->
+    <string name="qr_instruction">Position the QR code within the frame to connect automatically</string>
+    <string name="qr_title">Scan Teacher\'s QR Code</string>
+
+
+    <!-- Student Info Screen -->
+    <string name="screen_title">Student Information</string>
+    <string name="enter_your_details">Enter Your Details</string>
+    <string name="sub_title">Required for attendance tracking</string>
+    <string name="firstName">First Name</string>
+    <string name="firstNamePlaceholder">Enter your first name</string>
+    <string name="lastName">Last Name</string>
+    <string name="lastNamePlaceholder">Enter your Last name</string>
+    <string name="studentId">Student ID</string>
+    <string name="studentIDPlaceholder">Enter your ID</string>
+    <string name="infoText">This information will be sent to your teacher when you mark attendance</string>
+    <string name="continue_to_scanner">Continue to Scanner</string>
 </resources>
