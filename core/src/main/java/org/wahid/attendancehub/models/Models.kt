@@ -82,5 +82,6 @@ data class WifiNetwork(
 data class StudentInfo(
     val firstName: String,
     val lastName: String,
-    val studentId: String
+    val studentId: String,
+    val deviceId: String,
 )

@@ -38,13 +38,12 @@ fun AttendanceSuccessScreen(
             is AttendanceEffect.ReturnHome -> {
                 viewModel.disconnect()
                 navController.navigate(StudentScreen.NetworkScan.route){
-                    popUpTo(StudentScreen.Success.route){ inclusive = true }
+                    popUpTo(StudentScreen.NetworkScan.route){ inclusive = true }
                 }
             }
         }
-
-
     }
+
 
 
 
