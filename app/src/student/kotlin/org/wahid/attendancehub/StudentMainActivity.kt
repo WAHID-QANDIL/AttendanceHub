@@ -8,14 +8,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import org.wahid.attendancehub.student.navigation.StudentNavHost
 import org.wahid.attendancehub.student.ui.theme.AttendanceHubTheme
-import org.wahid.attendancehub.student.viewmodel.StudentViewModel
 
 class StudentMainActivity : ComponentActivity() {
-    private val viewModel by viewModels<StudentViewModel>()
     private var hasPermissions: Boolean = false
 
     private val permissionLauncher =
@@ -60,7 +57,6 @@ class StudentMainActivity : ComponentActivity() {
         setContent {
             AttendanceHubTheme {
                 StudentNavHost(
-                    viewModel = viewModel,
                     hasPermissions = hasPermissions
                 )
             }

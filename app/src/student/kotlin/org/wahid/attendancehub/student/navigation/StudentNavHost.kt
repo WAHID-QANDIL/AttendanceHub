@@ -2,21 +2,13 @@
 
 package org.wahid.attendancehub.student.navigation
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
+import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -24,195 +16,132 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import kotlinx.serialization.InternalSerializationApi
+import kotlinx.serialization.json.Json
+import org.koin.androidx.compose.koinViewModel
+import org.wahid.attendancehub.models.QRData
 import org.wahid.attendancehub.student.ui.screens.attendanceSuccess.AttendanceSuccessScreen
-import org.wahid.attendancehub.student.ui.screens.ConnectingScreen
-import org.wahid.attendancehub.student.ui.screens.ConnectionStep
-import org.wahid.attendancehub.student.ui.screens.ManualEntryDialog
+import org.wahid.attendancehub.student.ui.screens.connecting.ConnectingScreen
+import org.wahid.attendancehub.student.ui.screens.connecting.ConnectingScreenViewModel
+import org.wahid.attendancehub.student.ui.screens.connecting.ConnectingScreenEffect
+import org.wahid.attendancehub.student.ui.screens.connecting.ConnectingScreenUiState
+import org.wahid.attendancehub.student.ui.screens.connecting.ConnectionStep
 import org.wahid.attendancehub.student.ui.screens.permission.PermissionsScreen
 import org.wahid.attendancehub.student.ui.screens.qr_scanner.QRScannerScreen
-import org.wahid.attendancehub.student.ui.screens.home.StudentNetworkScanScreen
-import org.wahid.attendancehub.student.viewmodel.StudentUiState
-import org.wahid.attendancehub.student.viewmodel.StudentViewModel
-import kotlinx.serialization.InternalSerializationApi
+import org.wahid.attendancehub.utils.ObserveAsEffect
 
 @Composable
 fun StudentNavHost(
     navController: NavHostController = rememberNavController(),
-    viewModel: StudentViewModel = viewModel(),
     hasPermissions: Boolean = false
 ) {
-//    val uiState by viewModel.uiState.collectAsState()
-//    val availableNetworks by viewModel.availableNetworks.collectAsState()
-//    val firstName by viewModel.firstName.collectAsState()
-//    val lastName by viewModel.lastName.collectAsState()
-//    val studentId by viewModel.studentId.collectAsState()
-
-    // Navigate based on UI state
-//    LaunchedEffect(uiState) {
-//        when (val state = uiState) {
-//            is StudentUiState.StudentInfo -> {
-//                if (navController.currentDestination?.route != StudentScreen.StudentInfo.route) {
-//                    navController.navigate(StudentScreen.StudentInfo.route) {
-//                        popUpTo(0) { inclusive = true }
-//                    }
-//                }
-//            }
-//            is StudentUiState.QRScanning -> {
-//                if (navController.currentDestination?.route != StudentScreen.QRScanner.route) {
-//                    navController.navigate(StudentScreen.QRScanner.route)
-//                }
-//            }
-//            is StudentUiState.Connecting -> {
-//                if (navController.currentDestination?.route != "connecting/${state.networkName}") {
-//                    navController.navigate("connecting/${state.networkName}") {
-//                        popUpTo(StudentScreen.NetworkScan.route)
-//                    }
-//                }
-//            }
-//            is StudentUiState.Success -> {
-//                if (navController.currentDestination?.route != StudentScreen.Success.route) {
-//                    navController.navigate(StudentScreen.Success.route) {
-//                        popUpTo(StudentScreen.NetworkScan.route) { inclusive = true }
-//                    }
-//                }
-//            }
-//            is StudentUiState.Error -> {
-//                // Navigate back to network scan on error
-//                if (navController.currentDestination?.route != StudentScreen.NetworkScan.route) {
-//                    navController.navigate(StudentScreen.NetworkScan.route) {
-//                        popUpTo(StudentScreen.NetworkScan.route) { inclusive = true }
-//                    }
-//                }
-//            }
-//            is StudentUiState.Scanning -> {
-//                if (navController.currentDestination?.route == "connecting/{networkName}") {
-//                    navController.popBackStack()
-//                }
-//            }
-//            else -> { /* No navigation */ }
-//        }
-//    }
-
     CompositionLocalProvider(LocalNavController provides navController) {
         NavHost(
             navController = navController,
-            startDestination = if (hasPermissions) StudentScreen.StudentInfo.route else StudentScreen.Permissions.route
+            startDestination = if (hasPermissions) StudentScreen.NetworkScan.route else StudentScreen.Permissions.route
         ) {
-            // Student Info Screen
-            composable(StudentScreen.StudentInfo.route) {
-                org.wahid.attendancehub.student.ui.screens.StudentInfoScreen(
-                    onInfoSaved = { first, last, id ->
-                        viewModel.saveStudentInfo(first, last, id)
-                        navController.navigate(StudentScreen.NetworkScan.route){
-                            popUpTo(StudentScreen.StudentInfo.route) { inclusive = true}
-                        }
-                    },
-                    existingFirstName = firstName,
-                    existingLastName = lastName,
-                    existingStudentId = studentId
-                )
-            }
-
             // Permissions Screen
             composable(StudentScreen.Permissions.route) {
                 PermissionsScreen()
             }
 
-            // Network Scan Screen
+            // Network Scan Screen (Home)
             composable(StudentScreen.NetworkScan.route) {
-            LaunchedEffect(Unit) {
-                viewModel.scanNetworks()
-            }
-
-            // Show manual entry dialog when state is ManualEntry
-            if (uiState is StudentUiState.ManualEntry) {
-                ManualEntryDialog(
-                    onDismiss = { viewModel.cancelManualEntry() },
-                    onConnect = { ssid, password ->
-                        viewModel.connectManually(ssid, password)
-                    }
+                org.wahid.attendancehub.student.ui.screens.home.StudentNetworkScanScreen(
+                    navController = navController
                 )
             }
 
-            // Show error snackbar when state is Error
-            val snackbarHostState = remember { SnackbarHostState() }
-            if (uiState is StudentUiState.Error) {
-                val errorMessage = (uiState as StudentUiState.Error).message
-                LaunchedEffect(errorMessage) {
-                    snackbarHostState.showSnackbar(
-                        message = errorMessage,
-                        duration = SnackbarDuration.Long
-                    )
-                    // Reset to Idle after showing error
-                    viewModel.scanNetworks()
+            // QR Scanner Screen
+            composable(StudentScreen.QRScanner.route) {
+                QRScannerScreen(
+                    navController = navController
+                )
+            }
+
+            // Connecting Screen - receives QR data and handles connection
+            composable(
+                route = "connecting/{qrDataJson}",
+                arguments = listOf(navArgument("qrDataJson") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val qrDataJson = backStackEntry.arguments?.getString("qrDataJson") ?: ""
+                val decodedJson = Uri.decode(qrDataJson)
+                val qrData = Json.decodeFromString<QRData>(decodedJson)
+
+                val viewModel = koinViewModel<ConnectingScreenViewModel>()
+                val state by viewModel.state.collectAsStateWithLifecycle()
+
+                // Start connection when screen is displayed
+                LaunchedEffect(qrData) {
+                    viewModel.connectToNetwork(qrData)
+                }
+
+                // Handle navigation effects
+                ObserveAsEffect(viewModel.effect) { effect ->
+                    when (effect) {
+                        is ConnectingScreenEffect.NavigateToSuccess -> {
+                            navController.navigate(
+                                StudentScreen.Success.createRoute(
+                                    networkName = effect.networkName,
+                                    markedAtTime = effect.markedAtTime
+                                )
+                            ) {
+                                popUpTo(StudentScreen.QRScanner.route) { inclusive = true }
+                            }
+                        }
+                        is ConnectingScreenEffect.NavigateBack -> {
+                            navController.popBackStack()
+                        }
+                    }
+                }
+
+                // Render connecting screen based on state
+                when (val currentState = state) {
+                    is ConnectingScreenUiState.Connecting -> {
+                        ConnectingScreen(
+                            networkName = currentState.networkName,
+                            currentStep = currentState.currentStep
+                        )
+                    }
+                    is ConnectingScreenUiState.Error -> {
+                        // Show error screen or navigate back
+                        // For now, just show connecting with error (you can create an error screen)
+                        ConnectingScreen(
+                            networkName = qrData.ssid,
+                            currentStep = ConnectionStep.NETWORK_FOUND
+                        )
+                    }
+                    else -> {
+                        // Idle or Success state - show connecting
+                        ConnectingScreen(
+                            networkName = qrData.ssid,
+                            currentStep = ConnectionStep.NETWORK_FOUND
+                        )
+                    }
                 }
             }
 
-            Box(modifier = Modifier.fillMaxSize()) {
-                StudentNetworkScanScreen(
-                    availableNetworks = availableNetworks,
-                    onNetworkSelected = { network ->
-                        viewModel.connectToNetwork(network)
-                    },
-                    onRefresh = {
-                        viewModel.scanNetworks()
-                    },
-                    onScanQR = {
-                        viewModel.startQRScanning()
-                    },
-                    onManualEntry = {
-                        viewModel.startManualEntry()
-                    }
+            // Success Screen
+            composable(
+                route = "success/{networkName}/{markedAtTime}",
+                arguments = listOf(
+                    navArgument("networkName") { type = NavType.StringType },
+                    navArgument("markedAtTime") { type = NavType.StringType }
                 )
+            ) { backStackEntry ->
+                val networkName = backStackEntry.arguments?.getString("networkName") ?: ""
+                val markedAtTime = backStackEntry.arguments?.getString("markedAtTime") ?: ""
 
-                SnackbarHost(
-                    hostState = snackbarHostState,
-                    modifier = Modifier.align(Alignment.BottomCenter)
-                )
-            }
-        }
-
-        // QR Scanner Screen
-        composable(StudentScreen.QRScanner.route) {
-            QRScannerScreen(
-                onClose = {
-                    viewModel.cancelQRScanning()
-                    navController.popBackStack()
-                },
-                navController = navController
-            )
-        }
-
-        // Connecting Screen
-        composable(
-            route = "connecting/{networkName}",
-            arguments = listOf(navArgument("networkName") { type = NavType.StringType })
-        ) { backStackEntry ->
-            val networkName = backStackEntry.arguments?.getString("networkName") ?: ""
-            val state = uiState as? StudentUiState.Connecting
-
-            ConnectingScreen(
-                networkName = networkName,
-                currentStep = state?.currentStep ?: ConnectionStep.NETWORK_FOUND
-            )
-        }
-
-        // Success Screen
-        composable(StudentScreen.Success.route) {
-            val state = uiState as? StudentUiState.Success
-
-            state?.let {
                 AttendanceSuccessScreen(
-                    networkName = it.networkName,
-                    markedAtTime = it.markedAtTime,
+                    networkName = Uri.decode(networkName),
+                    markedAtTime = Uri.decode(markedAtTime),
                     navController = navController
                 )
             }
         }
     }
-    }
 }
 
-val LocalNavController = staticCompositionLocalOf<NavController> { //search static
+val LocalNavController = staticCompositionLocalOf<NavController> {
     error("NavController not provided")
 }
