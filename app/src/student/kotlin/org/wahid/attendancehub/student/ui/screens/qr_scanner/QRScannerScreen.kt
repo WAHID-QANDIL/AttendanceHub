@@ -21,10 +21,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import kotlinx.serialization.InternalSerializationApi
 import org.koin.androidx.compose.koinViewModel
+import org.wahid.attendancehub.student.navigation.StudentScreen
 import org.wahid.attendancehub.student.ui.screens.attendanceSuccess.AttendanceSuccessScreen
 import org.wahid.attendancehub.utils.ObserveAsEffect
 import java.util.concurrent.Executors
@@ -48,12 +50,17 @@ fun QRScannerScreen(
         }
     }
 
-    val state = qrScannerScreenViewModel.state.collectAsState()
+    val state = qrScannerScreenViewModel.state.collectAsStateWithLifecycle()
 
     // Handle navigation effects
     ObserveAsEffect(qrScannerScreenViewModel.effect) { effect ->
         when (effect) {
             is QrScannerEffect.NavigateToAttendanceSuccess -> {
+                navController.navigate(StudentScreen.Connecting.createRoute(
+                    networkName = effect.networkName
+                ))
+
+
                 // Navigate to the success screen - composable directly or through navigation
                 // Since we're using Jetpack Compose navigation, we can show the success screen directly
                 // by updating a local state, or navigate using navController
@@ -64,18 +71,13 @@ fun QRScannerScreen(
         }
     }
 
-    when(state.value){
+    when(val stateValue = state.value){
         QrScannerScreenUiState.ActiveScan -> {
             Box(modifier = Modifier.fillMaxSize()) {
                 CameraPreview(
                    lifecycleOwner = lifecycleOwner,
                     cameraExecutor = cameraExecutor,
                     viewModel = qrScannerScreenViewModel,
-//                    onQRCodeScanned,
-//                    onFlashDetected = { hasFlash = it },
-//                    onError = { qrScannerScreenViewModel. = it },
-//                    onSuccess = { successMessage = it },
-//                    isScanning = { isScanning = it }
                 )
 
                 Column(
@@ -153,7 +155,7 @@ fun QRScannerScreen(
             }
         }
         is QrScannerScreenUiState.Connected -> {
-            val connected = state.value as QrScannerScreenUiState.Connected
+            val connected = stateValue
 
             // Show the AttendanceSuccessScreen directly
             AttendanceSuccessScreen(
@@ -164,7 +166,7 @@ fun QRScannerScreen(
         }
 
         is QrScannerScreenUiState.Connecting -> {
-            val connecting = state.value as QrScannerScreenUiState.Connecting
+            val connecting = stateValue
 
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -211,7 +213,7 @@ fun QRScannerScreen(
         }
 
         is QrScannerScreenUiState.Error -> {
-            val error = (state.value as QrScannerScreenUiState.Error).message
+            val error = stateValue.message
 
             Box(modifier = Modifier.fillMaxSize()) {
                 Column(
@@ -265,7 +267,6 @@ fun QRScannerScreen(
         }
 
         QrScannerScreenUiState.Idle -> {
-            // Initial idle state - could show a loading indicator
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center

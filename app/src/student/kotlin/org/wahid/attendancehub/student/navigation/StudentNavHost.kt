@@ -41,57 +41,57 @@ fun StudentNavHost(
     viewModel: StudentViewModel = viewModel(),
     hasPermissions: Boolean = false
 ) {
-    val uiState by viewModel.uiState.collectAsState()
-    val availableNetworks by viewModel.availableNetworks.collectAsState()
-    val firstName by viewModel.firstName.collectAsState()
-    val lastName by viewModel.lastName.collectAsState()
-    val studentId by viewModel.studentId.collectAsState()
+//    val uiState by viewModel.uiState.collectAsState()
+//    val availableNetworks by viewModel.availableNetworks.collectAsState()
+//    val firstName by viewModel.firstName.collectAsState()
+//    val lastName by viewModel.lastName.collectAsState()
+//    val studentId by viewModel.studentId.collectAsState()
 
     // Navigate based on UI state
-    LaunchedEffect(uiState) {
-        when (val state = uiState) {
-            is StudentUiState.StudentInfo -> {
-                if (navController.currentDestination?.route != StudentScreen.StudentInfo.route) {
-                    navController.navigate(StudentScreen.StudentInfo.route) {
-                        popUpTo(0) { inclusive = true }
-                    }
-                }
-            }
-            is StudentUiState.QRScanning -> {
-                if (navController.currentDestination?.route != StudentScreen.QRScanner.route) {
-                    navController.navigate(StudentScreen.QRScanner.route)
-                }
-            }
-            is StudentUiState.Connecting -> {
-                if (navController.currentDestination?.route != "connecting/${state.networkName}") {
-                    navController.navigate("connecting/${state.networkName}") {
-                        popUpTo(StudentScreen.NetworkScan.route)
-                    }
-                }
-            }
-            is StudentUiState.Success -> {
-                if (navController.currentDestination?.route != StudentScreen.Success.route) {
-                    navController.navigate(StudentScreen.Success.route) {
-                        popUpTo(StudentScreen.NetworkScan.route) { inclusive = true }
-                    }
-                }
-            }
-            is StudentUiState.Error -> {
-                // Navigate back to network scan on error
-                if (navController.currentDestination?.route != StudentScreen.NetworkScan.route) {
-                    navController.navigate(StudentScreen.NetworkScan.route) {
-                        popUpTo(StudentScreen.NetworkScan.route) { inclusive = true }
-                    }
-                }
-            }
-            is StudentUiState.Scanning -> {
-                if (navController.currentDestination?.route == "connecting/{networkName}") {
-                    navController.popBackStack()
-                }
-            }
-            else -> { /* No navigation */ }
-        }
-    }
+//    LaunchedEffect(uiState) {
+//        when (val state = uiState) {
+//            is StudentUiState.StudentInfo -> {
+//                if (navController.currentDestination?.route != StudentScreen.StudentInfo.route) {
+//                    navController.navigate(StudentScreen.StudentInfo.route) {
+//                        popUpTo(0) { inclusive = true }
+//                    }
+//                }
+//            }
+//            is StudentUiState.QRScanning -> {
+//                if (navController.currentDestination?.route != StudentScreen.QRScanner.route) {
+//                    navController.navigate(StudentScreen.QRScanner.route)
+//                }
+//            }
+//            is StudentUiState.Connecting -> {
+//                if (navController.currentDestination?.route != "connecting/${state.networkName}") {
+//                    navController.navigate("connecting/${state.networkName}") {
+//                        popUpTo(StudentScreen.NetworkScan.route)
+//                    }
+//                }
+//            }
+//            is StudentUiState.Success -> {
+//                if (navController.currentDestination?.route != StudentScreen.Success.route) {
+//                    navController.navigate(StudentScreen.Success.route) {
+//                        popUpTo(StudentScreen.NetworkScan.route) { inclusive = true }
+//                    }
+//                }
+//            }
+//            is StudentUiState.Error -> {
+//                // Navigate back to network scan on error
+//                if (navController.currentDestination?.route != StudentScreen.NetworkScan.route) {
+//                    navController.navigate(StudentScreen.NetworkScan.route) {
+//                        popUpTo(StudentScreen.NetworkScan.route) { inclusive = true }
+//                    }
+//                }
+//            }
+//            is StudentUiState.Scanning -> {
+//                if (navController.currentDestination?.route == "connecting/{networkName}") {
+//                    navController.popBackStack()
+//                }
+//            }
+//            else -> { /* No navigation */ }
+//        }
+//    }
 
     CompositionLocalProvider(LocalNavController provides navController) {
         NavHost(
