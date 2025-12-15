@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -26,8 +27,9 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import kotlinx.serialization.InternalSerializationApi
 import org.koin.androidx.compose.koinViewModel
+import org.wahid.attendancehub.models.QRData
 import org.wahid.attendancehub.student.navigation.StudentScreen
-import org.wahid.attendancehub.student.ui.screens.attendanceSuccess.AttendanceSuccessScreen
+import org.wahid.attendancehub.student.ui.screens.StudentInfoBottomSheet
 import org.wahid.attendancehub.utils.ObserveAsEffect
 import java.util.concurrent.Executors
 
@@ -35,12 +37,21 @@ import java.util.concurrent.Executors
 @androidx.annotation.OptIn(ExperimentalGetImage::class)
 @Composable
 fun QRScannerScreen(
-    onClose: () -> Unit,
     navController: NavController,
     qrScannerScreenViewModel: QrScannerScreenViewModel = koinViewModel<QrScannerScreenViewModel>()
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
     val cameraExecutor = remember { Executors.newSingleThreadExecutor() }
+
+    // Student info management
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val sharedPrefs = remember { org.wahid.attendancehub.core.SharedPrefs.getInstance(context) }
+    val firestName by remember { sharedPrefs.firstName }.collectAsStateWithLifecycle()
+    val lastName by remember { sharedPrefs.lastName }.collectAsStateWithLifecycle()
+    val studentId by remember { sharedPrefs.studentId }.collectAsStateWithLifecycle()
+
+    var showStudentInfoSheet by remember { mutableStateOf(false) }
+    var pendingQrData by remember { mutableStateOf<QRData?>(null) }
 
     DisposableEffect(Unit) {
         Log.d("QRScanner", "QRScannerScreen DisposableEffect started")
@@ -55,20 +66,55 @@ fun QRScannerScreen(
     // Handle navigation effects
     ObserveAsEffect(qrScannerScreenViewModel.effect) { effect ->
         when (effect) {
-            is QrScannerEffect.NavigateToAttendanceSuccess -> {
-                navController.navigate(StudentScreen.Connecting.createRoute(
-                    networkName = effect.networkName
-                ))
-
-
-                // Navigate to the success screen - composable directly or through navigation
-                // Since we're using Jetpack Compose navigation, we can show the success screen directly
-                // by updating a local state, or navigate using navController
-                // For now, we'll just close and let the parent ViewModel handle the navigation
-                // In a more complete implementation, we could navigate directly here
-                onClose()
+            is QrScannerEffect.NavigateToConnecting -> {
+                // Check if student info exists
+                if (firestName.isBlank() || lastName.isBlank() || studentId.isBlank()) {
+                    // Show bottom sheet to collect info
+                    pendingQrData = effect.qrData
+                    showStudentInfoSheet = true
+                } else {
+                    // Info exists, proceed with connection
+                    navController.navigate(
+                        StudentScreen.Connecting.createRouteWithQrData(effect.qrData)
+                    ) {
+                        popUpTo(StudentScreen.QRScanner.route) { inclusive = true }
+                    }
+                }
+            }
+            is QrScannerEffect.NavigateBackHome -> {
+                navController.navigate(StudentScreen.NetworkScan.route) {
+                    popUpTo(StudentScreen.NetworkScan.route) { inclusive = true }
+                }
             }
         }
+    }
+
+    // Student Info Bottom Sheet
+    if (showStudentInfoSheet) {
+        StudentInfoBottomSheet(
+            onDismiss = {
+                showStudentInfoSheet = false
+                pendingQrData = null
+            },
+            onInfoSaved = { firstName, lastName, id ->
+                val deviceId = sharedPrefs.deviceId.value
+                sharedPrefs.saveStudentInfo(firstName, lastName, id, deviceId)
+                showStudentInfoSheet = false
+
+                // Proceed with connection after saving info
+                pendingQrData?.let { qrData ->
+                    navController.navigate(
+                        StudentScreen.Connecting.createRouteWithQrData(qrData)
+                    ) {
+                        popUpTo(StudentScreen.QRScanner.route) { inclusive = true }
+                    }
+                }
+                pendingQrData = null
+            },
+            existingFirstName = firestName,
+            existingLastName = lastName,
+            existingStudentId = studentId
+        )
     }
 
     when(val stateValue = state.value){
@@ -93,7 +139,10 @@ fun QRScannerScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         IconButton(
-                            onClick = onClose,
+                            onClick = {
+                                cameraExecutor.shutdown()
+                                qrScannerScreenViewModel.navigateHome()
+                            },
                             colors = IconButtonDefaults.iconButtonColors(
                                 containerColor = Color.Black.copy(alpha = 0.5f),
                                 contentColor = Color.White
@@ -103,6 +152,24 @@ fun QRScannerScreen(
                                 imageVector = Icons.Default.Close,
                                 contentDescription = "Close"
                             )
+                        }
+
+                        // Edit student info button
+                        if (firestName.isNotBlank()) {
+                            IconButton(
+                                onClick = {
+                                    showStudentInfoSheet = true
+                                },
+                                colors = IconButtonDefaults.iconButtonColors(
+                                    containerColor = Color.Black.copy(alpha = 0.5f),
+                                    contentColor = Color.White
+                                )
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Edit,
+                                    contentDescription = "Edit student info"
+                                )
+                            }
                         }
                     }
 
@@ -154,20 +221,9 @@ fun QRScannerScreen(
                 }
             }
         }
-        is QrScannerScreenUiState.Connected -> {
-            val connected = stateValue
 
-            // Show the AttendanceSuccessScreen directly
-            AttendanceSuccessScreen(
-                networkName = connected.networkName,
-                markedAtTime = connected.markedAtTime,
-                navController = navController
-            )
-        }
-
-        is QrScannerScreenUiState.Connecting -> {
-            val connecting = stateValue
-
+        QrScannerScreenUiState.Validating -> {
+            // Show validating indicator
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -189,23 +245,10 @@ fun QRScannerScreen(
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = stringResource(R.string.connecting),
+                            text = "Validating QR Code...",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             textAlign = TextAlign.Center
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = connecting.networkName,
-                            style = MaterialTheme.typography.bodyMedium,
-                            textAlign = TextAlign.Center,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Text(
-                            text = connecting.currentStep.toString(),
-                            style = MaterialTheme.typography.bodySmall,
-                            textAlign = TextAlign.Center,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -255,7 +298,10 @@ fun QRScannerScreen(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Button(
-                        onClick = onClose,
+                        onClick = {
+                            cameraExecutor.shutdown()
+                            qrScannerScreenViewModel.navigateHome()
+                        },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.primary
                         )
@@ -281,7 +327,6 @@ fun QRScannerScreen(
 @Composable
 fun QRScannerScreenPreview() {
     QRScannerScreen(
-        onClose = {},
         navController = rememberNavController()
     )
 }
