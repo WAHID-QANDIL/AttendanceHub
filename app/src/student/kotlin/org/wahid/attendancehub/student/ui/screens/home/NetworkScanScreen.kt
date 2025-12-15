@@ -4,30 +4,120 @@ import org.wahid.attendancehub.R
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import org.koin.androidx.compose.koinViewModel
+import org.wahid.attendancehub.core.SharedPrefs
 import org.wahid.attendancehub.models.WifiNetwork
+import org.wahid.attendancehub.student.navigation.StudentScreen
+import org.wahid.attendancehub.student.ui.screens.ManualEntryDialog
+import org.wahid.attendancehub.student.ui.screens.StudentInfoBottomSheet
+import org.wahid.attendancehub.utils.ObserveAsEffect
 
 
 @Composable
 fun StudentNetworkScanScreen(
+    navController: NavController,
+    viewModel: NetworkScanViewModel = koinViewModel<NetworkScanViewModel>()
+) {
+    val context = LocalContext.current
+    val sharedPrefs = remember { SharedPrefs.getInstance(context) }
+    val firstName by sharedPrefs.firstName.collectAsStateWithLifecycle()
+    val lastName by sharedPrefs.lastName.collectAsStateWithLifecycle()
+    val studentId by sharedPrefs.studentId.collectAsStateWithLifecycle()
+
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val availableNetworks by viewModel.availableNetworks.collectAsStateWithLifecycle()
+
+    var showManualEntryDialog by remember { mutableStateOf(false) }
+
+    // Handle navigation effects
+    ObserveAsEffect(viewModel.effect) { effect ->
+        when (effect) {
+            is NetworkScanEffect.NavigateToQRScanner -> {
+                navController.navigate(StudentScreen.QRScanner.route)
+            }
+            is NetworkScanEffect.NavigateToManualEntry -> {
+                showManualEntryDialog = true
+            }
+            is NetworkScanEffect.NavigateToConnecting -> {
+                // TODO: Navigate to connecting screen with network info
+            }
+        }
+    }
+
+    // Manual Entry Dialog
+    if (showManualEntryDialog) {
+        ManualEntryDialog(
+            onDismiss = { showManualEntryDialog = false },
+            onConnect = { ssid, password ->
+                showManualEntryDialog = false
+                // TODO: Handle manual connection with SSID and password
+                viewModel.onNetworkSelected(org.wahid.attendancehub.models.WifiNetwork(
+                    ssid = ssid,
+                    password = password,
+                    signalStrength = 5,
+                    isSecured = true,
+                    isTeacherNetwork = false
+                ))
+            }
+        )
+    }
+
+    // Show student info bottom sheet when needed
+    if (state is NetworkScanUiState.ShowStudentInfoSheet) {
+        StudentInfoBottomSheet(
+            onDismiss = { viewModel.dismissStudentInfoSheet() },
+            onInfoSaved = { first, last, id ->
+                val deviceId = sharedPrefs.deviceId.value
+                sharedPrefs.saveStudentInfo(first, last, id, deviceId)
+                viewModel.onStudentInfoSaved()
+            },
+            existingFirstName = firstName,
+            existingLastName = lastName,
+            existingStudentId = studentId
+        )
+    }
+
+    StudentNetworkScanContent(
+        availableNetworks = availableNetworks,
+        onNetworkSelected = { viewModel.onNetworkSelected(it) },
+        onRefresh = { viewModel.scanNetworks() },
+        onScanQR = { viewModel.onScanQRClicked() },
+        onManualEntry = { viewModel.onManualEntryClicked() },
+        isScanning = state is NetworkScanUiState.Scanning,
+        studentName = if (firstName.isNotBlank()) "$firstName $lastName" else null,
+        onOpenInfoSheet = { viewModel.showStudentInfoSheet() }
+    )
+}
+
+
+
+@Composable
+private fun StudentNetworkScanContent(
     availableNetworks: List<WifiNetwork>,
     onNetworkSelected: (WifiNetwork) -> Unit,
     onRefresh: () -> Unit,
     onScanQR: () -> Unit,
-    onManualEntry: () -> Unit
+    onManualEntry: () -> Unit,
+    isScanning: Boolean = false,
+    studentName: String? = null,
+    onOpenInfoSheet:()->Unit
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize().statusBarsPadding()
@@ -68,6 +158,52 @@ fun StudentNetworkScanScreen(
                     .fillMaxSize()
                     .padding(16.dp)
             ) {
+                // Student Info Card (if exists)
+                studentName?.let { name ->
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp).clickable(onClick = onOpenInfoSheet),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer
+                        )
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Person,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(32.dp)
+                                )
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Column {
+                                    Text(
+                                        text = "Logged in as",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                    Text(
+                                        text = name,
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+
                 // Available Networks Card
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -423,11 +559,8 @@ fun NetworkListItem(
 
 @Preview(showBackground = true)
 @Composable
-private fun TeacherScreenPreview() {
+private fun StudentNetworkScanScreenPreview() {
     StudentNetworkScanScreen(
-        availableNetworks = emptyList(),
-        onNetworkSelected = {},
-        onRefresh = {},
-        onScanQR = {  }
-    ) { }
+        navController = rememberNavController(),
+    )
 }
