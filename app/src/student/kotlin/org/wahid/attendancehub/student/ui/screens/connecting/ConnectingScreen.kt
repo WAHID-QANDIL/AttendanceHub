@@ -1,4 +1,4 @@
-package org.wahid.attendancehub.student.ui.screens
+package org.wahid.attendancehub.student.ui.screens.connecting
 
 import org.wahid.attendancehub.R
 import androidx.compose.animation.core.*
@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -147,7 +148,7 @@ fun ConnectingScreen(
 
 @Composable
 fun ConnectionStepItem(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: ImageVector,
     text: String,
     isCompleted: Boolean,
     isActive: Boolean
