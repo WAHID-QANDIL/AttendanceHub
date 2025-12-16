@@ -149,12 +149,16 @@ class QrScannerScreenViewModel(application: Application) :
                                                 "QR parsed - SSID: ${qrData.ssid}, Password: ${qrData.password}"
                                             )
                                             if (qrContent.trim().startsWith("{")) {
-                                                throw Exception("Invalid QR code format")
+                                                Log.d(
+                                                    "QRScanner",
+                                                    "QR code is valid JSON"
+                                                )
                                             } else {
                                                 Log.d(
                                                     "QRScanner",
                                                     "Ignoring non-JSON QR code"
                                                 )
+                                                throw Exception("Invalid QR code format")
                                             }
                                             if (qrData.ssid.isNotEmpty() && qrData.password.isNotEmpty()) {
                                                 Log.d(

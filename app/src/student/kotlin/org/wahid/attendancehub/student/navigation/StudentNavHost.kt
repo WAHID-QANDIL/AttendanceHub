@@ -26,6 +26,7 @@ import org.wahid.attendancehub.student.ui.screens.connecting.ConnectingScreenVie
 import org.wahid.attendancehub.student.ui.screens.connecting.ConnectingScreenEffect
 import org.wahid.attendancehub.student.ui.screens.connecting.ConnectingScreenUiState
 import org.wahid.attendancehub.student.ui.screens.connecting.ConnectionStep
+import org.wahid.attendancehub.student.ui.screens.home.StudentNetworkScanScreen
 import org.wahid.attendancehub.student.ui.screens.permission.PermissionsScreen
 import org.wahid.attendancehub.student.ui.screens.qr_scanner.QRScannerScreen
 import org.wahid.attendancehub.utils.ObserveAsEffect
@@ -113,9 +114,12 @@ fun StudentNavHost(
                     }
                     else -> {
                         // Idle or Success state - show connecting
-                        ConnectingScreen(
-                            networkName = qrData.ssid,
-                            currentStep = ConnectionStep.NETWORK_FOUND
+//                        ConnectingScreen(
+//                            networkName = qrData.ssid,
+//                            currentStep = ConnectionStep.NETWORK_FOUND
+//                        )
+                        StudentNetworkScanScreen(
+                            navController = navController
                         )
                     }
                 }
