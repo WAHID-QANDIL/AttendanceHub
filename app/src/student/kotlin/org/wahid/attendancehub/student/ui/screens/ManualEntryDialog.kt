@@ -28,10 +28,14 @@ import androidx.compose.ui.window.Dialog
 @Composable
 fun ManualEntryDialog(
     onDismiss: () -> Unit,
-    onConnect: (ssid: String, password: String) -> Unit
+    onConnect: (ssid: String, password: String, serverIp: String, port: Int, sessionId: String, token: String?) -> Unit
 ) {
     var ssid by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var serverIp by remember { mutableStateOf("192.168.49.1") }
+    var port by remember { mutableStateOf("8080") }
+    var sessionId by remember { mutableStateOf("") }
+    var token by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     var ssidError by remember { mutableStateOf<String?>(null) }
     var passwordError by remember { mutableStateOf<String?>(null) }
@@ -150,11 +154,117 @@ fun ManualEntryDialog(
                     ),
                     keyboardActions = KeyboardActions(
                         onDone = {
+                            focusManager.moveFocus(FocusDirection.Down)
+                        }
+                    ),
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp)
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Server IP Input
+                OutlinedTextField(
+                    value = serverIp,
+                    onValueChange = { serverIp = it },
+                    label = { Text("Server IP Address") },
+                    placeholder = { Text("192.168.49.1") },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Computer,
+                            contentDescription = null
+                        )
+                    },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Decimal,
+                        imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onNext = {
+                            focusManager.moveFocus(FocusDirection.Down)
+                        }
+                    ),
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp)
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Port Input
+                OutlinedTextField(
+                    value = port,
+                    onValueChange = { port = it.filter { char -> char.isDigit() } },
+                    label = { Text("Port") },
+                    placeholder = { Text("8080") },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Tag,
+                            contentDescription = null
+                        )
+                    },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onNext = {
+                            focusManager.moveFocus(FocusDirection.Down)
+                        }
+                    ),
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp)
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Session ID Input
+                OutlinedTextField(
+                    value = sessionId,
+                    onValueChange = { sessionId = it },
+                    label = { Text("Session ID") },
+                    placeholder = { Text("Enter session ID from teacher") },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Key,
+                            contentDescription = null
+                        )
+                    },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onNext = {
+                            focusManager.moveFocus(FocusDirection.Down)
+                        }
+                    ),
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp)
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Token Input (Optional)
+                OutlinedTextField(
+                    value = token,
+                    onValueChange = { token = it },
+                    label = { Text("Token (Optional)") },
+                    placeholder = { Text("Authentication token") },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Security,
+                            contentDescription = null
+                        )
+                    },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
                             focusManager.clearFocus()
-                            // Trigger connect if validation passes
-                            if (validateInput(ssid, password)) {
-                                onConnect(ssid.trim(), password)
-                            }
                         }
                     ),
                     modifier = Modifier.fillMaxWidth(),
@@ -224,15 +334,34 @@ fun ManualEntryDialog(
                                 hasError = true
                             }
 
+                            if (serverIp.trim().isEmpty()) {
+                                hasError = true
+                            }
+
+                            if (port.isEmpty() || port.toIntOrNull() == null) {
+                                hasError = true
+                            }
+
+                            if (sessionId.trim().isEmpty()) {
+                                hasError = true
+                            }
+
                             if (!hasError) {
-                                onConnect(ssid.trim(), password)
+                                onConnect(
+                                    ssid.trim(),
+                                    password,
+                                    serverIp.trim(),
+                                    port.toInt(),
+                                    sessionId.trim(),
+                                    token.takeIf { it.isNotBlank() }
+                                )
                             }
                         },
                         modifier = Modifier
                             .weight(1f)
                             .height(48.dp),
                         shape = RoundedCornerShape(24.dp),
-                        enabled = ssid.isNotEmpty() && password.isNotEmpty()
+                        enabled = ssid.isNotEmpty() && password.isNotEmpty() && serverIp.isNotEmpty() && port.isNotEmpty() && sessionId.isNotEmpty()
                     ) {
                         Icon(
                             imageVector = Icons.Default.WifiFind,
@@ -248,15 +377,11 @@ fun ManualEntryDialog(
     }
 }
 
-private fun validateInput(ssid: String, password: String): Boolean {
-    return ssid.trim().isNotEmpty() && password.isNotEmpty()
-}
-
 @Preview(showBackground = true)
 @Composable
 private fun ManualDialogPreview() {
     ManualEntryDialog(
-        onConnect = { _, _ -> },
+        onConnect = { _, _, _, _, _, _ -> },
         onDismiss = { }
     )
 }

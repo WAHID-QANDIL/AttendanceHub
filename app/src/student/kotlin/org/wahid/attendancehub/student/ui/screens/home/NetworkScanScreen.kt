@@ -1,5 +1,6 @@
 package org.wahid.attendancehub.student.ui.screens.home
 
+import kotlinx.serialization.InternalSerializationApi
 import org.wahid.attendancehub.R
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -30,6 +31,7 @@ import org.wahid.attendancehub.student.ui.screens.StudentInfoBottomSheet
 import org.wahid.attendancehub.utils.ObserveAsEffect
 
 
+@OptIn(InternalSerializationApi::class)
 @Composable
 fun StudentNetworkScanScreen(
     navController: NavController,
@@ -65,16 +67,23 @@ fun StudentNetworkScanScreen(
     if (showManualEntryDialog) {
         ManualEntryDialog(
             onDismiss = { showManualEntryDialog = false },
-            onConnect = { ssid, password ->
+            onConnect = { ssid, password, serverIp, port, sessionId, token ->
                 showManualEntryDialog = false
-                // TODO: Handle manual connection with SSID and password
-                viewModel.onNetworkSelected(org.wahid.attendancehub.models.WifiNetwork(
+
+                // Create QRData from manual entry
+                val qrData = org.wahid.attendancehub.models.QRData(
                     ssid = ssid,
                     password = password,
-                    signalStrength = 5,
-                    isSecured = true,
-                    isTeacherNetwork = false
-                ))
+                    serverIp = serverIp,
+                    port = port,
+                    sessionId = sessionId,
+                    token = token
+                )
+
+                // Navigate to connecting screen
+                navController.navigate(
+                    StudentScreen.Connecting.createRouteWithQrData(qrData)
+                )
             }
         )
     }
