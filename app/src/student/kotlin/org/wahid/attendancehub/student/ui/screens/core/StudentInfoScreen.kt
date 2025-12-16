@@ -1,4 +1,4 @@
-package org.wahid.attendancehub.student.ui.screens
+package org.wahid.attendancehub.student.ui.screens.core
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape

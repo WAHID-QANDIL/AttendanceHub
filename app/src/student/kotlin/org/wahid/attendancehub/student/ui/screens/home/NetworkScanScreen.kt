@@ -24,10 +24,11 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import org.koin.androidx.compose.koinViewModel
 import org.wahid.attendancehub.core.SharedPrefs
+import org.wahid.attendancehub.models.QRData
 import org.wahid.attendancehub.models.WifiNetwork
 import org.wahid.attendancehub.student.navigation.StudentScreen
-import org.wahid.attendancehub.student.ui.screens.ManualEntryDialog
-import org.wahid.attendancehub.student.ui.screens.StudentInfoBottomSheet
+import org.wahid.attendancehub.student.ui.screens.core.ManualEntryDialog
+import org.wahid.attendancehub.student.ui.screens.core.StudentInfoBottomSheet
 import org.wahid.attendancehub.utils.ObserveAsEffect
 
 
@@ -71,7 +72,7 @@ fun StudentNetworkScanScreen(
                 showManualEntryDialog = false
 
                 // Create QRData from manual entry
-                val qrData = org.wahid.attendancehub.models.QRData(
+                val qrData = QRData(
                     ssid = ssid,
                     password = password,
                     serverIp = serverIp,

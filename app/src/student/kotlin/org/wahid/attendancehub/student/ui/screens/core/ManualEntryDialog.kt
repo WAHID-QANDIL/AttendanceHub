@@ -1,4 +1,4 @@
-package org.wahid.attendancehub.student.ui.screens
+package org.wahid.attendancehub.student.ui.screens.core
 
 import org.wahid.attendancehub.R
 import androidx.compose.foundation.layout.*

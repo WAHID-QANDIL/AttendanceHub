@@ -29,7 +29,7 @@ import kotlinx.serialization.InternalSerializationApi
 import org.koin.androidx.compose.koinViewModel
 import org.wahid.attendancehub.models.QRData
 import org.wahid.attendancehub.student.navigation.StudentScreen
-import org.wahid.attendancehub.student.ui.screens.StudentInfoBottomSheet
+import org.wahid.attendancehub.student.ui.screens.core.StudentInfoBottomSheet
 import org.wahid.attendancehub.utils.ObserveAsEffect
 import java.util.concurrent.Executors
 
