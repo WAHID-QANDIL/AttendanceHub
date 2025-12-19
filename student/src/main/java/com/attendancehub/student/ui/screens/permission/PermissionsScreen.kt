@@ -91,20 +91,20 @@ fun PermissionsScreen(
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(bottom = 32.dp)
             )
+            Spacer(Modifier.height(16.dp))
             PermissionCard(
                 icon = Icons.Default.Wifi,
                 title = stringResource(R.string.permission_wifi_title),
                 description = stringResource(R.string.permission_wifi_desc),
-                modifier = Modifier.padding(bottom = 16.dp)
             )
+            Spacer(Modifier.height(16.dp))
             PermissionCard(
                 icon = Icons.Default.LocationOn,
                 title = stringResource(R.string.permission_location_title),
                 description = stringResource(R.string.permission_location_desc),
-                modifier = Modifier.padding(bottom = 16.dp)
             )
+            Spacer(Modifier.height(16.dp))
             PermissionCard(
                 icon = Icons.Default.CameraAlt,
                 title = stringResource(R.string.permission_camera_title),

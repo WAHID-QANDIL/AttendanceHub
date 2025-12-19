@@ -66,6 +66,12 @@ class WiFiScanner(private val context: Context) {
                                                    result.SSID.contains("Class",        ignoreCase = true)  ||
                                                    result.SSID.contains("AndroidShare", ignoreCase = true)  ||
                                                    result.SSID.contains("Attendance",   ignoreCase = true)
+                            /*
+                            * get ssid
+                            * navigate to manual dialog
+                            * auto fill selected ssid ssid
+                            * user enter password
+                            * */
 
                             WifiNetwork(
                                 ssid = result.SSID,

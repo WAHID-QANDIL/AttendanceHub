@@ -11,7 +11,6 @@ import com.attendancehub.api.AttendanceClient
 import com.attendancehub.models.ServerResponse
 import com.attendancehub.models.StudentAttendance
 import com.attendancehub.network.StudentHotspotConnectionManager
-import com.attendancehub.student.ui.screens.ConnectionStep
 import com.attendancehub.student.ui.screens.WifiNetwork
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -24,37 +23,11 @@ import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.InternalSerializationApi
 import java.util.UUID
 import androidx.core.content.edit
-
-sealed class StudentUiState {
-    object Idle : StudentUiState()
-    object StudentInfo : StudentUiState()
-    object QRScanning : StudentUiState()
-    object ManualEntry : StudentUiState()
-    data class Scanning(val networks: List<WifiNetwork>) : StudentUiState()
-    data class Connecting(
-        val networkName: String,
-        val currentStep: ConnectionStep,
-    ) : StudentUiState()
-    data class Success(
-        val networkName: String,
-        val connectedDuration: String,
-        val markedAtTime: String,
-    ) : StudentUiState()
-    data class Error(val message: String) : StudentUiState()
-}
+import com.attendancehub.student.ui.model.ConnectionStep
+import com.attendancehub.student.ui.ui_state.StudentUiState
 
 @OptIn(InternalSerializationApi::class)
 class StudentViewModel(application: Application) : AndroidViewModel(application) {
-    companion object {
-        private const val MANUAL_CONNECTION_EXPIRY_MS = 2 * 60 * 60 * 1000L // 2 hours
-        private const val PREFS_NAME = "student_prefs"
-        private const val KEY_FIRST_NAME = "first_name"
-        private const val KEY_LAST_NAME = "last_name"
-        private const val KEY_STUDENT_ID = "student_id"
-        private const val KEY_DEVICE_ID = "device_id"
-    }
-
-    private val TAG = "StudentViewModel"
     private val hotspotManager = StudentHotspotConnectionManager(application)
     private val attendanceClient = AttendanceClient(context = application)
     private val wifiScanner = com.attendancehub.network.WiFiScanner(application)
@@ -91,22 +64,24 @@ class StudentViewModel(application: Application) : AndroidViewModel(application)
            _studentId.value).any { it.isNotBlank() }
 
 
-    fun saveStudentInfo(firstName: String, lastName: String, studentId: String) {
-        _firstName.value = firstName
-        _lastName.value = lastName
-        _studentId.value = studentId
-
-        prefs.edit().apply {
-            putString(KEY_FIRST_NAME, firstName)
-            putString(KEY_LAST_NAME, lastName)
-            putString(KEY_STUDENT_ID, studentId)
-            apply()
-        }
-
-        Log.d(TAG, "Student info saved: $firstName $lastName ($studentId)")
-        // Navigate to network scan after saving
-        scanNetworks()
-    }
+//    fun saveStudentInfo(firstName: String, lastName: String, studentId: String) {
+//        _firstName.value = firstName
+//        _lastName.value = lastName
+//        _studentId.value = studentId
+//
+//        prefs.edit().apply {
+//            putString(KEY_FIRST_NAME, firstName)
+//            putString(KEY_LAST_NAME, lastName)
+//            putString(KEY_STUDENT_ID, studentId)
+//            apply()
+//        }
+//
+//        Log.d(TAG, "Student info saved: $firstName $lastName ($studentId)")
+//        _uiState.value = StudentUiState.Scanning(emptyList())
+//
+//        // Navigate to network scan after saving
+//        scanNetworks()
+//    }
 
     fun scanNetworks() {
         viewModelScope.launch {
@@ -418,5 +393,15 @@ class StudentViewModel(application: Application) : AndroidViewModel(application)
         val gatewayIp = Formatter.formatIpAddress(gatewayInt)
         Log.d(TAG, "Resolved teacher gateway IP: $gatewayIp")
         return gatewayIp
+    }
+
+    companion object {
+        private const val MANUAL_CONNECTION_EXPIRY_MS = 2 * 60 * 60 * 1000L // 2 hours
+        private const val PREFS_NAME = "student_prefs"
+        private const val KEY_FIRST_NAME = "first_name"
+        private const val KEY_LAST_NAME = "last_name"
+        private const val KEY_STUDENT_ID = "student_id"
+        private const val KEY_DEVICE_ID = "device_id"
+        private const val TAG = "StudentViewModel"
     }
 }

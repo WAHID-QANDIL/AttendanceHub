@@ -27,11 +27,15 @@ import androidx.navigation.navArgument
 import com.attendancehub.student.ui.screens.attendanceSuccess.AttendanceSuccessScreen
 import com.attendancehub.student.ui.screens.ConnectingScreen
 import com.attendancehub.student.ui.screens.ConnectionStep
+import com.attendancehub.student.ui.model.ConnectionStep
+import com.attendancehub.student.ui.screens.attendanceSuccess.AttendanceSuccessScreen
+import com.attendancehub.student.ui.screens.connection.ConnectingScreen
 import com.attendancehub.student.ui.screens.ManualEntryDialog
 import com.attendancehub.student.ui.screens.permission.PermissionsScreen
 import com.attendancehub.student.ui.screens.qr_scanner.QRScannerScreen
 import com.attendancehub.student.ui.screens.StudentNetworkScanScreen
-import com.attendancehub.student.viewmodel.StudentUiState
+import com.attendancehub.student.ui.screens.student_info.StudentInfoScreen
+import com.attendancehub.student.ui.ui_state.StudentUiState
 import com.attendancehub.student.viewmodel.StudentViewModel
 import kotlinx.serialization.InternalSerializationApi
 
@@ -57,11 +61,11 @@ fun StudentNavHost(
                     }
                 }
             }
-            is StudentUiState.QRScanning -> {
-                if (navController.currentDestination?.route != StudentScreen.QRScanner.route) {
-                    navController.navigate(StudentScreen.QRScanner.route)
-                }
-            }
+//            is StudentUiState.QRScanning -> {
+//                if (navController.currentDestination?.route != StudentScreen.QRScanner.route) {
+//                    navController.navigate(StudentScreen.QRScanner.route)
+//                }
+//            }
             is StudentUiState.Connecting -> {
                 if (navController.currentDestination?.route != "connecting/${state.networkName}") {
                     navController.navigate("connecting/${state.networkName}") {
@@ -98,30 +102,14 @@ fun StudentNavHost(
             navController = navController,
             startDestination = if (hasPermissions) StudentScreen.StudentInfo.route else StudentScreen.Permissions.route
         ) {
-            // Student Info Screen
             composable(StudentScreen.StudentInfo.route) {
-                com.attendancehub.student.ui.screens.StudentInfoScreen(
-                    onInfoSaved = { first, last, id ->
-                        viewModel.saveStudentInfo(first, last, id)
-                    },
-                    existingFirstName = firstName,
-                    existingLastName = lastName,
-                    existingStudentId = studentId
-                )
+                StudentInfoScreen()
             }
 
-            // Permissions Screen
             composable(StudentScreen.Permissions.route) {
-                PermissionsScreen(
-//                onGrantPermissions = {
-//                    navController.navigate(StudentScreen.NetworkScan.route) {
-//                        popUpTo(StudentScreen.Permissions.route) { inclusive = true }
-//                    }
-//                }
-                )
+                PermissionsScreen()
             }
 
-            // Network Scan Screen
             composable(StudentScreen.NetworkScan.route) {
             LaunchedEffect(Unit) {
                 viewModel.scanNetworks()
