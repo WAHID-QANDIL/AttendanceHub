@@ -61,11 +61,6 @@ fun StudentNavHost(
                     }
                 }
             }
-//            is StudentUiState.QRScanning -> {
-//                if (navController.currentDestination?.route != StudentScreen.QRScanner.route) {
-//                    navController.navigate(StudentScreen.QRScanner.route)
-//                }
-//            }
             is StudentUiState.Connecting -> {
                 if (navController.currentDestination?.route != "connecting/${state.networkName}") {
                     navController.navigate("connecting/${state.networkName}") {
@@ -73,13 +68,13 @@ fun StudentNavHost(
                     }
                 }
             }
-            is StudentUiState.Success -> {
-                if (navController.currentDestination?.route != StudentScreen.Success.route) {
-                    navController.navigate(StudentScreen.Success.route) {
-                        popUpTo(StudentScreen.NetworkScan.route) { inclusive = true }
-                    }
-                }
-            }
+//            is StudentUiState.Success -> {
+//                if (navController.currentDestination?.route != StudentScreen.Success.route) {
+//                    navController.navigate(StudentScreen.Success.route) {
+//                        popUpTo(StudentScreen.NetworkScan.route) { inclusive = true }
+//                    }
+//                }
+//            }
             is StudentUiState.Error -> {
                 // Navigate back to network scan on error
                 if (navController.currentDestination?.route != StudentScreen.NetworkScan.route) {
