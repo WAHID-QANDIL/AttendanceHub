@@ -5,6 +5,10 @@
 **Modern Android Application for Classroom Attendance Management**
 ![AttendanceHub.png](AttendanceHub.png)
 
+<img width="1536" height="1024" alt="ChatGPT Image Dec 26, 2025, 06_59_59 PM" src="https://github.com/user-attachments/assets/bcf971a2-acc9-4374-975c-60fd6c287507" />
+<img width="1536" height="1024" alt="ChatGPT Image Dec 26, 2025, 07_03_32 PM" src="https://github.com/user-attachments/assets/7b7bf8e7-032b-4e56-b7aa-b166bfc7f00b" />
+
+
 [![Platform](https://img.shields.io/badge/Platform-Android-green.svg)](https://www.android.com/)
 [![Language](https://img.shields.io/badge/Language-Kotlin-blue.svg)](https://kotlinlang.org/)
 [![UI](https://img.shields.io/badge/UI-Jetpack%20Compose-brightgreen.svg)](https://developer.android.com/jetpack/compose)
