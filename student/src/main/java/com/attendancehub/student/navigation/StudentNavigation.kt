@@ -10,4 +10,3 @@ sealed class StudentScreen(val route: String) {
     }
     object Success : StudentScreen("success")
 }
-

@@ -8,11 +8,12 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -23,13 +24,17 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.attendancehub.student.ui.screens.AttendanceSuccessScreen
+import com.attendancehub.student.ui.screens.attendanceSuccess.AttendanceSuccessScreen
 import com.attendancehub.student.ui.screens.ConnectingScreen
 import com.attendancehub.student.ui.screens.ConnectionStep
+import com.attendancehub.student.ui.model.ConnectionStep
+import com.attendancehub.student.ui.screens.attendanceSuccess.AttendanceSuccessScreen
+import com.attendancehub.student.ui.screens.connection.ConnectingScreen
 import com.attendancehub.student.ui.screens.ManualEntryDialog
 import com.attendancehub.student.ui.screens.permission.PermissionsScreen
-import com.attendancehub.student.ui.screens.QRScannerScreen
+import com.attendancehub.student.ui.screens.qr_scanner.QRScannerScreen
 import com.attendancehub.student.ui.screens.StudentNetworkScanScreen
+import com.attendancehub.student.ui.screens.student_info.StudentInfoScreen
 import com.attendancehub.student.ui.ui_state.StudentUiState
 import com.attendancehub.student.viewmodel.StudentViewModel
 import kotlinx.serialization.InternalSerializationApi
@@ -56,11 +61,6 @@ fun StudentNavHost(
                     }
                 }
             }
-            is StudentUiState.QRScanning -> {
-                if (navController.currentDestination?.route != StudentScreen.QRScanner.route) {
-                    navController.navigate(StudentScreen.QRScanner.route)
-                }
-            }
             is StudentUiState.Connecting -> {
                 if (navController.currentDestination?.route != "connecting/${state.networkName}") {
                     navController.navigate("connecting/${state.networkName}") {
@@ -68,13 +68,13 @@ fun StudentNavHost(
                     }
                 }
             }
-            is StudentUiState.Success -> {
-                if (navController.currentDestination?.route != StudentScreen.Success.route) {
-                    navController.navigate(StudentScreen.Success.route) {
-                        popUpTo(StudentScreen.NetworkScan.route) { inclusive = true }
-                    }
-                }
-            }
+//            is StudentUiState.Success -> {
+//                if (navController.currentDestination?.route != StudentScreen.Success.route) {
+//                    navController.navigate(StudentScreen.Success.route) {
+//                        popUpTo(StudentScreen.NetworkScan.route) { inclusive = true }
+//                    }
+//                }
+//            }
             is StudentUiState.Error -> {
                 // Navigate back to network scan on error
                 if (navController.currentDestination?.route != StudentScreen.NetworkScan.route) {
@@ -92,35 +92,20 @@ fun StudentNavHost(
         }
     }
 
-    NavHost(
-        navController = navController,
-        startDestination = if (hasPermissions) StudentScreen.StudentInfo.route else StudentScreen.Permissions.route
-    ) {
-        // Student Info Screen
-        composable(StudentScreen.StudentInfo.route) {
-            com.attendancehub.student.ui.screens.StudentInfoScreen(
-                onInfoSaved = { first, last, id ->
-                    viewModel.saveStudentInfo(first, last, id)
-                },
-                existingFirstName = firstName,
-                existingLastName = lastName,
-                existingStudentId = studentId
-            )
-        }
+    CompositionLocalProvider(LocalNavController provides navController) {
+        NavHost(
+            navController = navController,
+            startDestination = if (hasPermissions) StudentScreen.StudentInfo.route else StudentScreen.Permissions.route
+        ) {
+            composable(StudentScreen.StudentInfo.route) {
+                StudentInfoScreen()
+            }
 
-        // Permissions Screen
-        composable(StudentScreen.Permissions.route) {
-            PermissionsScreen(
-//                onGrantPermissions = {
-//                    navController.navigate(StudentScreen.NetworkScan.route) {
-//                        popUpTo(StudentScreen.Permissions.route) { inclusive = true }
-//                    }
-//                }
-            )
-        }
+            composable(StudentScreen.Permissions.route) {
+                PermissionsScreen()
+            }
 
-        // Network Scan Screen
-        composable(StudentScreen.NetworkScan.route) {
+            composable(StudentScreen.NetworkScan.route) {
             LaunchedEffect(Unit) {
                 viewModel.scanNetworks()
             }
@@ -222,8 +207,9 @@ fun StudentNavHost(
             }
         }
     }
+    }
 }
 
-val LocalNavController = compositionLocalOf<NavController> { //search static
+val LocalNavController = staticCompositionLocalOf<NavController> { //search static
     error("NavController not provided")
 }

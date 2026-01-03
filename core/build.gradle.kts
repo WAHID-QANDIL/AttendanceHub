@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.attendancehub.core"
+    namespace = "org.wahid.attendancehub.core"
     compileSdk = 36
 
     defaultConfig {

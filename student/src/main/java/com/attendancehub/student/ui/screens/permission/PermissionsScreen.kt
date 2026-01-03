@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,15 +33,15 @@ fun PermissionsScreen(
 ) {
     val navController = LocalNavController.current
 
-    ObserveAsEffect(viewModel.effect) { effect ->
-        when(effect) {
-            is PermissionEffect.NavigateToStudentInfo -> {
-                navController.navigate(StudentScreen.NetworkScan.route) {
-                    popUpTo(StudentScreen.Permissions.route) { inclusive = true }
+        ObserveAsEffect(viewModel.effect) { effect ->
+            when (effect) {
+                is PermissionEffect.NavigateToStudentInfo -> {
+                    navController.navigate(StudentScreen.NetworkScan.route) {
+                        popUpTo(StudentScreen.Permissions.route) { inclusive = true }
+                    }
                 }
             }
         }
-    }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
@@ -75,7 +76,8 @@ fun PermissionsScreen(
                 color = MaterialTheme.colorScheme.primary,
                 iconTint = Color.White,
                 icon = Icons.Default.Shield,
-                modifier = Modifier.size(80.dp)
+                modifier = Modifier.size(80.dp),
+                iconModifier = Modifier.size(40.dp)
             )
             Spacer(modifier = Modifier.height(24.dp))
             Text(
@@ -89,20 +91,20 @@ fun PermissionsScreen(
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(bottom = 32.dp)
             )
+            Spacer(Modifier.height(16.dp))
             PermissionCard(
                 icon = Icons.Default.Wifi,
                 title = stringResource(R.string.permission_wifi_title),
                 description = stringResource(R.string.permission_wifi_desc),
-                modifier = Modifier.padding(bottom = 16.dp)
             )
+            Spacer(Modifier.height(16.dp))
             PermissionCard(
                 icon = Icons.Default.LocationOn,
                 title = stringResource(R.string.permission_location_title),
                 description = stringResource(R.string.permission_location_desc),
-                modifier = Modifier.padding(bottom = 16.dp)
             )
+            Spacer(Modifier.height(16.dp))
             PermissionCard(
                 icon = Icons.Default.CameraAlt,
                 title = stringResource(R.string.permission_camera_title),

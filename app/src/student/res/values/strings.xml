@@ -1,5 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Student Attendance</string>
-</resources>
+    <string name="student_module_name">Student Module</string>
+    <string name="attendance_check_in">Attendance Check-In</string>
+    <string name="connect_teacher_network_prompt">Connect to your teacher\'s network</string>
+    <string name="available_networks">Available Networks</string>
+    <string name="refresh">Refresh</string>
+    <string name="looking_for_class">Looking for your class?</string>
+    <string name="looking_for_class_description">Make sure your teacher has enabled their hotspot. Then tap the refresh button to scan for networks.</string>
+    <string name="scan_qr_code">Scan QR Code</string>
+    <string name="enter_network_manually">Enter Network Manually</string>
+    <string name="strong_signal">Strong signal</string>
+    <string name="connect_to_class">Connect to Class</string>
+    <string name="teacher_network_found">Teacher network found!</string>
+    <string name="teacher_network_found_desc">Connect to mark your attendance for today\'s class.</string>
+    <string name="secured_network">Secured</string>
+    <string name="open_network">Open</string>
+    <string name="signal_strength">Signal strength</string>
+    <string name="connected_header">Connected</string>
+    <string name="attendance_marked_header">Attendance marked</string>
+    <string name="youre_all_set">You\'re all set! 🎉</string>
+    <string name="attendance_recorded_msg">Your attendance has been\nsuccessfully recorded</string>
+    <string name="label_network">Network</string>
+    <string name="label_connected_for">Connected for</string>
+    <string name="label_marked_at">Marked at</string>
+    <string name="disconnect_button">Disconnect</string>
+    <string name="disconnect_warning">Only disconnect if you need to leave early</string>
+    
+    <!-- Manual Entry Dialog -->
+    <string name="manual_connection_title">Manual Connection</string>
+    <string name="close_button_desc">Close</string>
+    <string name="manual_connection_subtitle">Enter the WiFi network details provided by your teacher</string>
+    <string name="ssid_label">Network Name (SSID)</string>
+    <string name="ssid_placeholder">e.g., DIRECT-xy-Android_1234</string>
+    <string name="password_label">Password</string>
+    <string name="password_placeholder">Enter WiFi password</string>
+    <string name="hide_password_desc">Hide password</string>
+    <string name="show_password_desc">Show password</string>
+    <string name="manual_entry_info">Ask your teacher for the exact network name and password if you don\'t have the QR code.</string>
+    <string name="cancel_button">Cancel</string>
+    <string name="connect_button">Connect</string>
+    <string name="error_ssid_required">Network name is required</string>
+    <string name="error_password_required">Password is required</string>
 
+    <!-- Permissions Screen -->
+    <string name="app_name_display">Attendance Tracker</string>
+    <string name="permissions_subtitle">We need a few permissions to help you take attendance</string>
+    <string name="permission_wifi_title">WiFi Access</string>
+    <string name="permission_wifi_desc">Required to connect to teacher\'s network</string>
+    <string name="permission_location_title">Location</string>
+    <string name="permission_location_desc">Needed for WiFi scanning</string>
+    <string name="permission_camera_title">Camera</string>
+    <string name="permission_camera_desc">To scan QR codes for quick connection</string>
+    <string name="grant_permissions_button">Grant Permissions</string>
+    <string name="permissions_footer">These permissions are required for the app to function properly</string>
+
+    <!-- Connecting Screen -->
+    <string name="connecting_title">Connecting...</string>
+    <string name="establishing_connection_fmt">Establishing connection to\n%1$s</string>
+    <string name="authenticating_info">Please approve the WiFi connection request when the system dialog appears.</string>
+    <string name="step_network_found">Network found</string>
+    <string name="step_authenticating">Authenticating...</string>
+    <string name="step_registering">Registering attendance</string>
+    <string name="align_the_qr_code_within_the_frame_to_scan_your_attendance">Align the QR code within the frame to record your attendance.</string>
+    <string name="attendance_marked">Attendance Marked!</string>
+    <string name="connecting">Connecting...</string>
+    <string name="error">Error</string>
+    <string name="close">Close</string>
+</resources>

@@ -45,7 +45,7 @@ class WiFiScanner(private val context: Context) {
 
         // Register receiver for scan results
         val receiver = object : BroadcastReceiver() {
-            @RequiresPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+            @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION])
             override fun onReceive(context: Context?, intent: Intent?) {
                 if (intent?.action == WifiManager.SCAN_RESULTS_AVAILABLE_ACTION) {
                     val success = intent.getBooleanExtra(WifiManager.EXTRA_RESULTS_UPDATED, false)
@@ -66,6 +66,12 @@ class WiFiScanner(private val context: Context) {
                                                    result.SSID.contains("Class",        ignoreCase = true)  ||
                                                    result.SSID.contains("AndroidShare", ignoreCase = true)  ||
                                                    result.SSID.contains("Attendance",   ignoreCase = true)
+                            /*
+                            * get ssid
+                            * navigate to manual dialog
+                            * auto fill selected ssid ssid
+                            * user enter password
+                            * */
 
                             WifiNetwork(
                                 ssid = result.SSID,
